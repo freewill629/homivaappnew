@@ -18,7 +18,11 @@ class _HomivaLogoPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF0A84FF)
+      ..shader = const LinearGradient(
+        colors: [Color(0xFF1C9BFF), Color(0xFF0066FF)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
       ..style = PaintingStyle.fill;
 
     final rect = RRect.fromRectAndRadius(

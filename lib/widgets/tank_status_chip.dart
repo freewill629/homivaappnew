@@ -3,29 +3,60 @@ import 'package:flutter/material.dart';
 class TankStatusChip extends StatelessWidget {
   const TankStatusChip({
     required this.isOn,
-    required this.hasData,
+    required this.hasStatus,
+    this.isConnected = false,
     super.key,
   });
 
   final bool isOn;
-  final bool hasData;
+  final bool hasStatus;
+  final bool isConnected;
 
   @override
   Widget build(BuildContext context) {
-    final color = isOn ? const Color(0xFF16A34A) : Colors.black38;
-    final background = isOn ? const Color(0xFFD1FAE5) : const Color(0xFFE5E7EB);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+    final backgroundGradient = isOn
+        ? const [Color(0xFF34D399), Color(0xFF10B981)]
+        : const [Color(0xFFCBD5F5), Color(0xFFA5B4FC)];
+    final borderColor = isConnected
+        ? Colors.white.withOpacity(0.4)
+        : Colors.white.withOpacity(0.12);
+    final label = hasStatus
+        ? (isOn ? 'Power ON' : 'Power OFF')
+        : 'Awaiting status';
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 240),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: hasData ? background : const Color(0xFFE5E7EB),
+        gradient: LinearGradient(colors: backgroundGradient),
         borderRadius: BorderRadius.circular(24),
-      ),
-      child: Text(
-        hasData ? (isOn ? 'ON' : 'OFF') : 'PENDING',
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: hasData ? color : Colors.black45,
-              fontWeight: FontWeight.w700,
+        border: Border.all(color: borderColor),
+        boxShadow: [
+          if (hasStatus)
+            BoxShadow(
+              color: (isOn ? const Color(0xFF0F766E) : const Color(0xFF312E81)).withOpacity(0.22),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
             ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            isOn ? Icons.flash_on : Icons.flash_off,
+            size: 18,
+            color: Colors.white,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.2,
+                ),
+          ),
+        ],
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/tank_provider.dart';
+import '../../widgets/glass_container.dart';
 import '../../widgets/live_sync_status.dart';
 import '../../widgets/tank_status_chip.dart';
 import '../../widgets/tank_toggle.dart';
@@ -15,116 +16,161 @@ class TankControlScreen extends StatelessWidget {
     final tankProvider = context.watch<TankProvider>();
     final level = tankProvider.waterLevel;
     final isOn = tankProvider.isOn ?? false;
-    final hasData = tankProvider.hasData;
     final updatedAt = _formatTime(tankProvider.updatedAt);
 
+    final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Tank Control')),
-      body: ListView(
-        padding: const EdgeInsets.all(24),
-        children: [
-          if (tankProvider.error != null)
-            _InfoBanner(message: tankProvider.error!),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-              child: Column(
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white.withOpacity(0.2)),
+              ),
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  WaterLevelGauge(
-                    level: level,
-                    isConnected: tankProvider.isConnected,
-                    isLoading: tankProvider.isLoading && !tankProvider.hasData,
-                  ),
-                  const SizedBox(height: 24),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE0F2FE),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.stacked_line_chart, color: Color(0xFF0369A1)),
-                        const SizedBox(width: 12),
-                        Text(
-                          'Recommended range 4.0 – 8.5',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: const Color(0xFF0C4A6E),
-                              ),
+                  const Icon(Icons.tungsten, color: Colors.white),
+                  const SizedBox(width: 8),
+                  Text('Tank control', style: theme.textTheme.titleMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.w700)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF0F172A), Color(0xFF1E3A8A), Color(0xFF312E81)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (tankProvider.error != null)
+                  _InfoBanner(message: tankProvider.error!),
+                GlassContainer(
+                  child: Column(
+                    children: [
+                      WaterLevelGauge(
+                        level: level,
+                        isConnected: tankProvider.isConnected,
+                        isLoading: tankProvider.isLoading && !tankProvider.hasData,
+                      ),
+                      const SizedBox(height: 24),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(24),
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF38BDF8), Color(0xFF6366F1)],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
                         ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.trending_flat, color: Color(0xFF1D4ED8)),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Trend: Steady',
-                        style: Theme.of(context).textTheme.bodyMedium,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.insights, color: Colors.white),
+                                const SizedBox(width: 12),
+                                Text(
+                                  'Optimal range 4.0 – 8.5',
+                                  style: theme.textTheme.titleMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                            Text(
+                              level != null ? '${level.toStringAsFixed(1)} m now' : '--',
+                              style: theme.textTheme.titleMedium?.copyWith(color: Colors.white70, fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.trending_up, color: Colors.white.withOpacity(0.9)),
+                          const SizedBox(width: 8),
+                          Text('Trend: Steady', style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white70)),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+                ),
+                const SizedBox(height: 24),
+                GlassContainer(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Tank Power',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                      Row(
+                        children: [
+                          Text(
+                            'Tank power orchestration',
+                            style: theme.textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w700),
+                          ),
+                          const Spacer(),
+                          TankStatusChip(
+                            isOn: isOn,
+                            hasStatus: tankProvider.hasStatus,
+                            isConnected: tankProvider.isConnected,
+                          ),
+                        ],
                       ),
-                      const Spacer(),
-                      TankStatusChip(isOn: isOn, hasData: hasData),
+                      const SizedBox(height: 12),
+                      LiveSyncStatus(
+                        label: tankProvider.isConnected ? 'Live · syncing' : 'Awaiting connection',
+                        isActive: tankProvider.isConnected,
+                        color: Colors.white70,
+                        activeDotColor: const Color(0xFF34D399),
+                        inactiveDotColor: Colors.white24,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Updated: $updatedAt',
+                        style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white60),
+                      ),
+                      const SizedBox(height: 24),
+                      TankToggle(
+                        isOn: isOn,
+                        enabled: tankProvider.canControl && !tankProvider.isWriting,
+                        busy: tankProvider.isWriting,
+                        onChanged: (value) async {
+                          final success = await context.read<TankProvider>().toggleTank(value);
+                          if (!success && context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Failed to update tank status. Please try again.')),
+                            );
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'This control writes directly to /tank/status in Firebase Realtime Database.',
+                        style: theme.textTheme.bodySmall?.copyWith(color: Colors.white54),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  LiveSyncStatus(
-                    label: tankProvider.isConnected ? 'Live · syncing' : 'Awaiting connection',
-                    isActive: tankProvider.isConnected,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Updated: $updatedAt',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.black54),
-                  ),
-                  const SizedBox(height: 24),
-                  TankToggle(
-                    isOn: isOn,
-                    enabled: hasData && !tankProvider.isWriting,
-                    busy: tankProvider.isWriting,
-                    onChanged: (value) async {
-                      final success = await context.read<TankProvider>().toggleTank(value);
-                      if (!success && context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Failed to update tank status. Please try again.')),
-                        );
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Toggle writes directly to /tank/status in Firebase Realtime Database.',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.black54),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -151,18 +197,25 @@ class _InfoBanner extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF4E5),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFF97316)),
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFD9C0), Color(0xFFFFEDD5)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFF97316).withOpacity(0.5)),
+        boxShadow: const [
+          BoxShadow(color: Color(0x33F97316), blurRadius: 16, offset: Offset(0, 8)),
+        ],
       ),
       child: Row(
         children: [
-          const Icon(Icons.wifi_off, color: Color(0xFFF97316)),
+          const Icon(Icons.wifi_off, color: Color(0xFF9A3412)),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               message,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: const Color(0xFF9A3412)),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: const Color(0xFF7C2D12), fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -170,3 +223,4 @@ class _InfoBanner extends StatelessWidget {
     );
   }
 }
+

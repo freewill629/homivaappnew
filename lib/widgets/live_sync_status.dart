@@ -5,24 +5,32 @@ class LiveSyncStatus extends StatelessWidget {
     required this.label,
     required this.isActive,
     super.key,
+    this.color,
+    this.activeDotColor,
+    this.inactiveDotColor,
   });
 
   final String label;
   final bool isActive;
+  final Color? color;
+  final Color? activeDotColor;
+  final Color? inactiveDotColor;
 
   @override
   Widget build(BuildContext context) {
+    final textColor = color ?? (isActive ? const Color(0xFF047857) : Colors.black54);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _PulsingDot(active: isActive),
+        _PulsingDot(
+          active: isActive,
+          activeColor: activeDotColor ?? const Color(0xFF10B981),
+          inactiveColor: inactiveDotColor ?? Colors.black26,
+        ),
         const SizedBox(width: 8),
         Text(
           label,
-          style: Theme.of(context)
-              .textTheme
-              .bodyMedium
-              ?.copyWith(color: isActive ? const Color(0xFF047857) : Colors.black54),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: textColor),
         ),
       ],
     );
@@ -30,9 +38,15 @@ class LiveSyncStatus extends StatelessWidget {
 }
 
 class _PulsingDot extends StatefulWidget {
-  const _PulsingDot({required this.active});
+  const _PulsingDot({
+    required this.active,
+    required this.activeColor,
+    required this.inactiveColor,
+  });
 
   final bool active;
+  final Color activeColor;
+  final Color inactiveColor;
 
   @override
   State<_PulsingDot> createState() => _PulsingDotState();
@@ -81,7 +95,7 @@ class _PulsingDotState extends State<_PulsingDot> with SingleTickerProviderState
       width: 10,
       height: 10,
       decoration: BoxDecoration(
-        color: widget.active ? const Color(0xFF10B981) : Colors.black26,
+        color: widget.active ? widget.activeColor : widget.inactiveColor,
         shape: BoxShape.circle,
       ),
     );
