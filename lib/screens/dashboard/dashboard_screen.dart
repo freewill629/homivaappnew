@@ -37,128 +37,38 @@ class DashboardScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         children: [
+          if (user != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Text(
+                'Welcome back, ${user.email}',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
           if (tankProvider.error != null)
             _DisconnectedBanner(message: tankProvider.error!),
-          if (user != null) ...[
-            Text(
-              'Welcome back, ${user.email}',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 16),
-          ],
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  WaterLevelGauge(
-                    level: tankProvider.waterLevel,
-                    isConnected: tankProvider.isConnected,
-                    isLoading: tankProvider.isLoading && !tankProvider.hasData,
-                  ),
-                ],
-              ),
-            ),
+          _TankOverviewCard(
+            provider: tankProvider,
+            updatedAtLabel: updatedAtLabel,
           ),
           const SizedBox(height: 16),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Tank Power',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-                      ),
-                      const Spacer(),
-                      TankStatusChip(isOn: isOn, hasData: hasData),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  LiveSyncStatus(
-                    label: tankProvider.isConnected ? 'Live · syncing' : 'Awaiting connection',
-                    isActive: tankProvider.isConnected,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Updated: $updatedAtLabel',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.black54),
-                  ),
-                  const SizedBox(height: 24),
-                  TankToggle(
-                    isOn: isOn,
-                    enabled: canToggle,
-                    busy: tankProvider.isWriting,
-                    onChanged: (value) async {
-                      final success = await context.read<TankProvider>().toggleTank(value);
-                      if (!success && context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Failed to update tank status. Please try again.')),
-                        );
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Segmentation ensures hardware-safe switching between ON/OFF.',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.black54),
-                  ),
-                  const SizedBox(height: 16),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton.icon(
-                      onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => const TankControlScreen(),
-                        ),
-                      ),
-                      icon: const Icon(Icons.open_in_new),
-                      label: const Text('Open full tank control'),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          _TankPowerCard(
+            isOn: isOn,
+            canToggle: canToggle,
+            provider: tankProvider,
           ),
           const SizedBox(height: 24),
-          Text('Product roadmap', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 8),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              childAspectRatio: 1.3,
-            ),
-            itemCount: _features.length,
-            itemBuilder: (context, index) {
-              final feature = _features[index];
-              return CardPlaceholder(
-                title: feature.title,
-                description: feature.description,
-              );
-            },
+          Text(
+            'Product roadmap',
+            style: Theme.of(context).textTheme.titleMedium,
           ),
+          const SizedBox(height: 8),
+          const _ProductRoadmapGrid(),
         ],
       ),
     );
   }
 
-  String _formatTime(DateTime? time) {
-    if (time == null) {
-      return '--:--:--';
-    }
-    final hours = time.hour.toString().padLeft(2, '0');
-    final minutes = time.minute.toString().padLeft(2, '0');
-    final seconds = time.second.toString().padLeft(2, '0');
-    return '$hours:$minutes:$seconds';
-  }
 }
 
 class _DisconnectedBanner extends StatelessWidget {
@@ -197,6 +107,176 @@ class _FeatureDescription {
 
   final String title;
   final String description;
+}
+
+String _formatTime(DateTime? time) {
+  if (time == null) {
+    return '--:--:--';
+  }
+  final hours = time.hour.toString().padLeft(2, '0');
+  final minutes = time.minute.toString().padLeft(2, '0');
+  final seconds = time.second.toString().padLeft(2, '0');
+  return '$hours:$minutes:$seconds';
+}
+
+class _TankOverviewCard extends StatelessWidget {
+  const _TankOverviewCard({
+    required this.provider,
+    required this.updatedAtLabel,
+  });
+
+  final TankProvider provider;
+  final String updatedAtLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Text(
+                  'Water level',
+                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                ),
+                const Spacer(),
+                LiveSyncStatus(
+                  label: provider.isConnected ? 'Live · syncing' : 'Awaiting connection',
+                  isActive: provider.isConnected,
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            WaterLevelGauge(
+              level: provider.waterLevel,
+              isConnected: provider.isConnected,
+              isLoading: provider.isLoading && !provider.hasData,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Updated: $updatedAtLabel',
+              style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black54),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TankPowerCard extends StatelessWidget {
+  const _TankPowerCard({
+    required this.isOn,
+    required this.canToggle,
+    required this.provider,
+  });
+
+  final bool isOn;
+  final bool canToggle;
+  final TankProvider provider;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  'Tank Power',
+                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                ),
+                const Spacer(),
+                TankStatusChip(isOn: isOn, hasData: provider.hasData),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Toggle tank hardware remotely with live safety checks.',
+              style: theme.textTheme.bodySmall?.copyWith(color: Colors.black54),
+            ),
+            const SizedBox(height: 20),
+            TankToggle(
+              isOn: isOn,
+              enabled: canToggle,
+              busy: provider.isWriting,
+              onChanged: (value) async {
+                final success = await context.read<TankProvider>().toggleTank(value);
+                if (!success && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Failed to update tank status. Please try again.')),
+                  );
+                }
+              },
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                LiveSyncStatus(
+                  label: provider.isConnected ? 'Live · syncing' : 'Awaiting connection',
+                  isActive: provider.isConnected,
+                ),
+                const Spacer(),
+                Text(
+                  'Updated: ${_formatTime(provider.updatedAt)}',
+                  style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black54),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const TankControlScreen(),
+                  ),
+                ),
+                icon: const Icon(Icons.open_in_new),
+                label: const Text('Open full tank control'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ProductRoadmapGrid extends StatelessWidget {
+  const _ProductRoadmapGrid();
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
+        childAspectRatio: 1.3,
+      ),
+      itemCount: _features.length,
+      itemBuilder: (context, index) {
+        final feature = _features[index];
+        return CardPlaceholder(
+          title: feature.title,
+          description: feature.description,
+        );
+      },
+    );
+  }
 }
 
 const _features = [
