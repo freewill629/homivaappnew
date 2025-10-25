@@ -12,21 +12,13 @@ class DbService {
   Future<void> ensureTankDataExists() async {
     final snapshot = await tankRef.get();
     if (!snapshot.exists) {
-      await tankRef.set({
-        'status': false,
-        'water_level_percent': 65.0,
-        'updated_at': ServerValue.timestamp,
-      });
+      await tankRef.set(_defaultTankPayload());
       return;
     }
 
     final value = snapshot.value;
     if (value is! Map) {
-      await tankRef.set({
-        'status': false,
-        'water_level_percent': 65.0,
-        'updated_at': ServerValue.timestamp,
-      });
+      await tankRef.set(_defaultTankPayload());
       return;
     }
 
@@ -41,18 +33,17 @@ class DbService {
     }
 
     if (percent is num) {
-      final normalized = percent.toDouble().clamp(0, 100);
-      if (normalized != percent) {
-        updates['water_level_percent'] = normalized.toDouble();
-      } else if (percent is int) {
-        updates['water_level_percent'] = percent.toDouble();
-      }
+      final normalizedPercent = _normalizePercent(percent.toDouble());
+      updates['water_level_percent'] = normalizedPercent;
+      updates['water_level'] = _percentToLevel(normalizedPercent);
     } else if (legacyLevel is num) {
-      final normalized = (legacyLevel.toDouble().clamp(0, 10) / 10.0) * 100.0;
-      updates['water_level_percent'] = double.parse(normalized.toStringAsFixed(1));
-      updates['water_level'] = null; // remove legacy field
+      final normalizedLevel = legacyLevel.toDouble().clamp(0, 10);
+      updates['water_level'] = double.parse(normalizedLevel.toStringAsFixed(1));
+      updates['water_level_percent'] =
+          double.parse((normalizedLevel * 10).toStringAsFixed(1));
     } else {
       updates['water_level_percent'] = 65.0;
+      updates['water_level'] = 6.5;
     }
 
     if (updatedAt is! num) {
@@ -70,7 +61,9 @@ class DbService {
       updates['status'] = status;
     }
     if (waterLevelPercent != null) {
-      updates['water_level_percent'] = waterLevelPercent.clamp(0, 100).toDouble();
+      final normalizedPercent = _normalizePercent(waterLevelPercent);
+      updates['water_level_percent'] = normalizedPercent;
+      updates['water_level'] = _percentToLevel(normalizedPercent);
     }
     if (updates.isNotEmpty) {
       updates['updated_at'] = ServerValue.timestamp;
@@ -86,4 +79,23 @@ FirebaseDatabase _resolveDatabase(FirebaseApp? app) {
     return FirebaseDatabase.instanceFor(app: resolvedApp, databaseURL: databaseUrl);
   }
   return FirebaseDatabase.instanceFor(app: resolvedApp);
+}
+
+Map<String, Object?> _defaultTankPayload() {
+  return {
+    'status': false,
+    'water_level': 6.5,
+    'water_level_percent': 65.0,
+    'updated_at': ServerValue.timestamp,
+  };
+}
+
+double _percentToLevel(double percent) {
+  final normalized = percent.clamp(0, 100) / 10.0;
+  return double.parse(normalized.toStringAsFixed(1));
+}
+
+double _normalizePercent(double percent) {
+  final normalized = percent.clamp(0, 100);
+  return double.parse(normalized.toStringAsFixed(1));
 }

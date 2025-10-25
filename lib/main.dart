@@ -13,7 +13,7 @@ Future<void> main() async {
       storageBucket: 'homiva-63bb7.firebasestorage.app',
       messagingSenderId: '823522876319',
       appId: '1:823522876319:web:9a95916e6d85e6abd63baa',
-      databaseURL: 'https://homiva-63bb7-default-rtdb.firebaseio.com',
+      databaseURL: 'https://homiva-63bb7-default-rtdb.asia-southeast1.firebasedatabase.app',
     ),
   );
   runApp(const HomivaApp());
