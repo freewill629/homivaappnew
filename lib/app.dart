@@ -20,7 +20,11 @@ class HomivaApp extends StatelessWidget {
         Provider<DbService>(create: (_) => DbService()),
         ChangeNotifierProxyProvider<DbService, TankProvider>(
           create: (context) => TankProvider(db: context.read<DbService>()),
-          update: (_, db, previous) => previous?..attachDb(db) ?? TankProvider(db: db),
+          update: (_, db, previous) {
+            final provider = previous ?? TankProvider(db: db);
+            provider.attachDb(db);
+            return provider;
+          },
         ),
       ],
       child: Consumer<AuthService>(
