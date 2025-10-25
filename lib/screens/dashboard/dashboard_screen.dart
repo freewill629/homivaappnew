@@ -21,7 +21,6 @@ class DashboardScreen extends StatelessWidget {
     final user = context.watch<User?>();
     final tankProvider = context.watch<TankProvider>();
     final updatedAtLabel = _formatTime(tankProvider.updatedAt);
-    final hasData = tankProvider.hasData;
     final isOn = tankProvider.isOn ?? false;
     final canToggle = tankProvider.canControl && !tankProvider.isWriting;
 
@@ -237,7 +236,7 @@ class _DisconnectedBanner extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFF97316).withOpacity(0.5)),
+        border: Border.all(color: const Color(0xFFF97316).withValues(alpha: 0.5)),
         boxShadow: const [
           BoxShadow(color: Color(0x33F97316), blurRadius: 16, offset: Offset(0, 8)),
         ],
