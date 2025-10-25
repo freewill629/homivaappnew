@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 ThemeData buildTheme() {
   final base = ThemeData.light(useMaterial3: true);
+  final interTextTheme = GoogleFonts.interTextTheme(base.textTheme);
   return base.copyWith(
     colorScheme: base.colorScheme.copyWith(
       primary: const Color(0xFF0A84FF),
@@ -15,10 +17,9 @@ ThemeData buildTheme() {
       elevation: 0,
       centerTitle: false,
     ),
-    textTheme: base.textTheme.apply(
-      bodyColor: const Color(0xFF1A1C1E),
-      displayColor: const Color(0xFF1A1C1E),
-      fontFamily: 'Roboto',
+    textTheme: interTextTheme.apply(
+      bodyColor: const Color(0xFF111827),
+      displayColor: const Color(0xFF111827),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
@@ -29,11 +30,22 @@ ThemeData buildTheme() {
         textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
       ),
     ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: const Color(0xFF0A84FF),
+        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+      ),
+    ),
     cardTheme: CardTheme(
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       color: Colors.white,
       margin: const EdgeInsets.symmetric(vertical: 8),
+    ),
+    chipTheme: base.chipTheme.copyWith(
+      backgroundColor: const Color(0xFFE5E7EB),
+      labelStyle: interTextTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
     ),
   );
 }
