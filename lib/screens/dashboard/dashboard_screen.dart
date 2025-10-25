@@ -200,12 +200,19 @@ class _FeatureDescription {
 }
 
 const _features = [
-  _FeatureDescription('Water Quality', 'AI-based TDS, pH and mineral tracking.'),
-  _FeatureDescription('AI Analytics', 'Consumption forecasting with adaptive alerts.'),
-  _FeatureDescription('Smart Alerts', 'Low-water and overflow warnings to your phone.'),
-  _FeatureDescription('Solar Integration', 'Coordinate solar pumps for energy savings.'),
-  _FeatureDescription('Safety & Security', 'Leak and tamper detection across tanks.'),
-  _FeatureDescription('Purifier Control', 'Remote RO/UV purifier automation.'),
-  _FeatureDescription('Rainwater Harvesting', 'Monitor rooftop inflow and recharge stats.'),
-  _FeatureDescription('Manual Bypass', 'Fallback hardware controls with guidance.'),
+  _FeatureDescription('Automatic water level control', 'Auto-fill and drain orchestration with adaptive scheduling.'),
+  _FeatureDescription('Real-time multi-tank monitoring', 'Live insights across every connected storage tank.'),
+  _FeatureDescription('IoT device management', 'Pair new controllers, push OTA firmware, stay updated.'),
+  _FeatureDescription('Water quality monitoring', 'TDS, pH and mineral intelligence with AI recommendations.'),
+  _FeatureDescription('Usage analytics & AI reports', 'Predictive consumption reports and household insights.'),
+  _FeatureDescription('Low-water alerts & emergency mode', 'Emergency cut-offs and mobile alerts before tanks run dry.'),
+  _FeatureDescription('Manual bypass options (hardware)', 'Guided fallback hardware overrides for technicians.'),
+  _FeatureDescription('Self-cleaning assistance', 'Automated rinse cycles with reminders and logs.'),
+  _FeatureDescription('Solar-powered operation widgets', 'Sync solar pumps and energy budgets automatically.'),
+  _FeatureDescription('Safety & security (leak/overflow)', 'Leak, overflow, and intrusion detection at a glance.'),
+  _FeatureDescription('Tank tampering alerts', 'Get notified on unauthorized access or tamper events.'),
+  _FeatureDescription('Modular upgrade kits', 'Plug-and-play expansion packs for new capabilities.'),
+  _FeatureDescription('Hard water conversion controls', 'Switch between softening modes remotely.'),
+  _FeatureDescription('Built-in water purification controls', 'RO/UV automation with filter health tracking.'),
+  _FeatureDescription('Rainwater harvesting views', 'Capture inflow analytics and recharge efficiency.'),
 ];
