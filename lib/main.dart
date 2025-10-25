@@ -7,8 +7,14 @@ import 'firebase_options.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (Firebase.apps.isEmpty) {
+  const defaultFirebaseAppName = '[DEFAULT]';
+  final hasDefaultApp = Firebase.apps.any(
+    (app) => app.name == defaultFirebaseAppName,
+  );
+
+  if (!hasDefaultApp) {
     await Firebase.initializeApp(
+      name: defaultFirebaseAppName,
       options: DefaultFirebaseOptions.currentPlatform,
     );
   }
