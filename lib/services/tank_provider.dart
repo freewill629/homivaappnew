@@ -20,7 +20,8 @@ class TankProvider extends ChangeNotifier {
 
   double? get waterLevelPercent => _waterLevelPercent;
   @Deprecated('Use waterLevelPercent instead')
-  double? get waterLevel => _waterLevelPercent;
+  double? get waterLevel =>
+      _waterLevelPercent != null ? _waterLevelPercent! / 10 : null;
   bool? get isOn => _isOn;
   bool get isLoading => _isLoading;
   bool get isWriting => _isWriting;
@@ -55,23 +56,25 @@ class TankProvider extends ChangeNotifier {
         if (raw is Map<dynamic, dynamic>) {
           final status = raw['status'];
           final levelPercent = raw['water_level_percent'];
-          final legacyLevel = raw['water_level'];
+          final levelValue = raw['water_level'];
           if (status is bool) {
             _isOn = status;
           }
-          if (levelPercent is num) {
+          if (levelValue is num) {
+            final normalizedLevel = levelValue.toDouble().clamp(0, 10);
+            final asPercent = normalizedLevel * 10.0;
+            _waterLevelPercent =
+                double.parse(asPercent.clamp(0, 100).toStringAsFixed(1));
+          } else if (levelPercent is num) {
             final normalized = levelPercent.toDouble().clamp(0, 100);
             _waterLevelPercent = double.parse(normalized.toStringAsFixed(1));
-          } else if (legacyLevel is num) {
-            final normalized = (legacyLevel.toDouble().clamp(0, 10) / 10.0) * 100.0;
-            _waterLevelPercent = double.parse(normalized.clamp(0, 100).toStringAsFixed(1));
           }
           final timestamp = raw['updated_at'];
           if (timestamp is num) {
             _updatedAt =
                 DateTime.fromMillisecondsSinceEpoch(timestamp.toInt(), isUtc: true).toLocal();
           }
-          if (status is bool || levelPercent is num || legacyLevel is num) {
+          if (status is bool || levelPercent is num || levelValue is num) {
             _updatedAt ??= DateTime.now();
             _error = null;
           } else {
@@ -117,10 +120,10 @@ class TankProvider extends ChangeNotifier {
     _isWriting = true;
     notifyListeners();
     try {
-      final simulatedLevelPercent = next ? 92.0 : 48.0;
-      await _db.updateTankState(status: next, waterLevelPercent: simulatedLevelPercent);
+      final simulatedLevel = next ? 9.2 : 4.8;
+      await _db.updateTankState(status: next, waterLevel: simulatedLevel);
       _isOn = next;
-      _waterLevelPercent = simulatedLevelPercent;
+      _waterLevelPercent = double.parse((simulatedLevel * 10).toStringAsFixed(1));
       _updatedAt = DateTime.now();
       _error = null;
       return true;
