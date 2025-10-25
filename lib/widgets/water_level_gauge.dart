@@ -21,6 +21,7 @@ class WaterLevelGauge extends StatelessWidget {
     final value = level;
     final pct = value != null ? (value.clamp(0, 10)) / 10.0 : 0.0;
     final hasValue = value != null;
+    final formattedLevel = value?.toStringAsFixed(1);
     final statusText = isLoading
         ? 'Connecting…'
         : isConnected
@@ -39,7 +40,7 @@ class WaterLevelGauge extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    hasValue ? '${value!.toStringAsFixed(1)} / 10' : '-- / 10',
+                    hasValue ? '$formattedLevel / 10' : '-- / 10',
                     style: Theme.of(context)
                         .textTheme
                         .headlineMedium

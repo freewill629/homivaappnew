@@ -41,7 +41,7 @@ class TankToggle extends StatelessWidget {
           Container(
             height: 56,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withValues(alpha: 0.7),
               borderRadius: BorderRadius.circular(12),
             ),
             alignment: Alignment.center,
