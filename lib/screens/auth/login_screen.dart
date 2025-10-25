@@ -69,55 +69,45 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final isWide = constraints.maxWidth > 760;
-                final hero = GlassContainer(
-                  padding: const EdgeInsets.fromLTRB(32, 32, 32, 40),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const HomivaLogo(size: 64),
-                      const SizedBox(height: 24),
-                      Text(
-                        'Welcome to Homiva',
-                        style: theme.textTheme.displaySmall?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -0.5,
-                            ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Monitor and orchestrate every tank with a single tap. Real-time telemetry, AI scheduling and emergency overrides are ready when you are.',
-                        style: theme.textTheme.bodyLarge?.copyWith(color: Colors.white70, height: 1.5),
-                      ),
-                      const SizedBox(height: 24),
-                      Wrap(
-                        spacing: 12,
-                        runSpacing: 12,
-                        children: const [
-                          _HeroChip(label: 'Realtime water level'),
-                          _HeroChip(label: 'Secure remote relays'),
-                          _HeroChip(label: 'Predictive alerts'),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-
-                final form = GlassContainer(
-                  padding: const EdgeInsets.fromLTRB(32, 32, 32, 36),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 420),
+                child: GlassContainer(
+                  padding: const EdgeInsets.fromLTRB(32, 36, 32, 40),
                   child: Form(
                     key: _formKey,
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const HomivaLogo(size: 96),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Homiva',
+                                style: theme.textTheme.headlineSmall?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: -0.2,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 32),
                         Text(
                           _isLogin ? 'Sign in to continue' : 'Create your control hub',
                           style: theme.textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w700),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Manage your smart tanks anywhere, anytime.',
+                          style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white70),
+                        ),
+                        const SizedBox(height: 28),
                         TextFormField(
                           controller: _emailController,
                           decoration: const InputDecoration(
@@ -155,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 28),
                         SizedBox(
                           width: double.infinity,
                           child: PrimaryButton(
@@ -165,18 +155,21 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        TextButton(
-                          onPressed: _loading
-                              ? null
-                              : () => setState(() {
-                                    _isLogin = !_isLogin;
-                                  }),
-                          child: Text(
-                            _isLogin ? 'Need an account? Sign up' : 'Already have an account? Sign in',
-                            style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),
+                        Align(
+                          alignment: Alignment.center,
+                          child: TextButton(
+                            onPressed: _loading
+                                ? null
+                                : () => setState(() {
+                                      _isLogin = !_isLogin;
+                                    }),
+                            child: Text(
+                              _isLogin ? 'Need an account? Sign up' : 'Already have an account? Sign in',
+                              style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),
+                            ),
                           ),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 8),
                         Text(
                           'By continuing you accept the Homiva Terms of Service.',
                           style: theme.textTheme.bodySmall?.copyWith(color: Colors.white54),
@@ -184,27 +177,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                   ),
-                );
-
-                final children = <Widget>[
-                  SizedBox(
-                    width: isWide ? 360 : double.infinity,
-                    child: hero,
-                  ),
-                  SizedBox(
-                    width: isWide ? 420 : double.infinity,
-                    child: form,
-                  ),
-                ];
-
-                return Wrap(
-                  alignment: WrapAlignment.center,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: 32,
-                  runSpacing: 32,
-                  children: children,
-                );
-              },
+                ),
+              ),
             ),
           ),
         ),
@@ -213,31 +187,3 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-class _HeroChip extends StatelessWidget {
-  const _HeroChip({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.16),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.auto_awesome, size: 16, color: Colors.white),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
-          ),
-        ],
-      ),
-    );
-  }
-}
