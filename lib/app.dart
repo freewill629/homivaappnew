@@ -29,7 +29,7 @@ class HomivaApp extends StatelessWidget {
       ],
       child: Consumer<AuthService>(
         builder: (context, auth, _) {
-          return StreamProvider<User?>(
+          return StreamProvider<User?>.value(
             value: auth.authStateChanges,
             initialData: auth.currentUser,
             child: Consumer<TankProvider>(
