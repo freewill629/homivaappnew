@@ -24,7 +24,10 @@ class TankProvider extends ChangeNotifier {
   bool get isWriting => _isWriting;
   DateTime? get updatedAt => _updatedAt;
   String? get error => _error;
-  bool get hasData => _waterLevel != null && _isOn != null;
+  bool get hasLevel => _waterLevel != null;
+  bool get hasStatus => _isOn != null;
+  bool get hasData => hasLevel || hasStatus;
+  bool get canControl => hasStatus && _error == null;
   bool get isConnected => hasData && _error == null;
 
   void attachDb(DbService db) {
@@ -44,9 +47,13 @@ class TankProvider extends ChangeNotifier {
         if (raw is Map<dynamic, dynamic>) {
           final status = raw['status'];
           final level = raw['water_level'];
-          if (status is bool && level is num) {
-            _waterLevel = level.toDouble();
+          if (status is bool) {
             _isOn = status;
+          }
+          if (level is num) {
+            _waterLevel = level.toDouble();
+          }
+          if (status is bool || level is num) {
             _updatedAt = DateTime.now();
             _error = null;
           } else {
@@ -92,6 +99,8 @@ class TankProvider extends ChangeNotifier {
     try {
       await _db.tankRef.update({'status': next});
       _isOn = next;
+      _updatedAt = DateTime.now();
+      _error = null;
       return true;
     } catch (e) {
       if (previous != null) {

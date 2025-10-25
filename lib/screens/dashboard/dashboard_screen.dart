@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import '../../services/auth_service.dart';
 import '../../services/tank_provider.dart';
 import '../../widgets/card_placeholder.dart';
+import '../../widgets/glass_container.dart';
+import '../../widgets/homiva_logo.dart';
 import '../../widgets/live_sync_status.dart';
 import '../../widgets/tank_status_chip.dart';
 import '../../widgets/tank_toggle.dart';
@@ -21,131 +23,188 @@ class DashboardScreen extends StatelessWidget {
     final updatedAtLabel = _formatTime(tankProvider.updatedAt);
     final hasData = tankProvider.hasData;
     final isOn = tankProvider.isOn ?? false;
-    final canToggle = hasData && !tankProvider.isWriting;
+    final canToggle = tankProvider.canControl && !tankProvider.isWriting;
+
+    final theme = Theme.of(context);
+    final headline = theme.textTheme.headlineMedium?.copyWith(
+      color: Colors.white,
+      fontWeight: FontWeight.w700,
+      letterSpacing: -0.4,
+    );
+    final subtle = theme.textTheme.bodyMedium?.copyWith(color: Colors.white70);
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: const Text('Homiva MVP'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        titleSpacing: 0,
+        title: Row(
+          children: [
+            const HomivaLogo(size: 36),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Homiva', style: theme.textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w700)),
+                Text('Smart water intelligence', style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70)),
+              ],
+            ),
+          ],
+        ),
         actions: [
           IconButton(
             tooltip: 'Sign out',
             onPressed: () => context.read<AuthService>().signOut(),
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout, color: Colors.white),
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        children: [
-          if (tankProvider.error != null)
-            _DisconnectedBanner(message: tankProvider.error!),
-          if (user != null) ...[
-            Text(
-              'Welcome back, ${user.email}',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 16),
-          ],
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  WaterLevelGauge(
-                    level: tankProvider.waterLevel,
-                    isConnected: tankProvider.isConnected,
-                    isLoading: tankProvider.isLoading && !tankProvider.hasData,
-                  ),
-                ],
-              ),
-            ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF0B1121), Color(0xFF111F4D), Color(0xFF1F3A8A)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-          const SizedBox(height: 16),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (tankProvider.error != null)
+                  _DisconnectedBanner(message: tankProvider.error!),
+                if (user != null)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Tank Power',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-                      ),
-                      const Spacer(),
-                      TankStatusChip(isOn: isOn, hasData: hasData),
+                      Text('Welcome back,', style: subtle),
+                      const SizedBox(height: 4),
+                      Text(user.email ?? 'Explorer', style: headline),
+                      const SizedBox(height: 24),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  LiveSyncStatus(
-                    label: tankProvider.isConnected ? 'Live · syncing' : 'Awaiting connection',
-                    isActive: tankProvider.isConnected,
+                GlassContainer(
+                  child: Column(
+                    children: [
+                      WaterLevelGauge(
+                        level: tankProvider.waterLevel,
+                        isConnected: tankProvider.isConnected,
+                        isLoading: tankProvider.isLoading && !tankProvider.hasData,
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Last sync', style: subtle),
+                              const SizedBox(height: 4),
+                              Text(updatedAtLabel, style: theme.textTheme.titleMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.w600)),
+                            ],
+                          ),
+                          LiveSyncStatus(
+                            label: tankProvider.isConnected ? 'Live · syncing' : 'Awaiting connection',
+                            isActive: tankProvider.isConnected,
+                            color: Colors.white70,
+                            activeDotColor: const Color(0xFF34D399),
+                            inactiveDotColor: Colors.white24,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Updated: $updatedAtLabel',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.black54),
-                  ),
-                  const SizedBox(height: 24),
-                  TankToggle(
-                    isOn: isOn,
-                    enabled: canToggle,
-                    busy: tankProvider.isWriting,
-                    onChanged: (value) async {
-                      final success = await context.read<TankProvider>().toggleTank(value);
-                      if (!success && context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Failed to update tank status. Please try again.')),
-                        );
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Segmentation ensures hardware-safe switching between ON/OFF.',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.black54),
-                  ),
-                  const SizedBox(height: 16),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton.icon(
-                      onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => const TankControlScreen(),
+                ),
+                const SizedBox(height: 24),
+                GlassContainer(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text('Tank power orchestration', style: theme.textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w700)),
+                          const Spacer(),
+                          TankStatusChip(
+                            isOn: isOn,
+                            hasStatus: tankProvider.hasStatus,
+                            isConnected: tankProvider.isConnected,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      LiveSyncStatus(
+                        label: tankProvider.isConnected ? 'Live · syncing' : 'Awaiting connection',
+                        isActive: tankProvider.isConnected,
+                        color: Colors.white70,
+                        activeDotColor: const Color(0xFF34D399),
+                        inactiveDotColor: Colors.white24,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Remote switching updates the ESP32 relay instantly. Your hardware stays protected with software interlocks.',
+                        style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white70),
+                      ),
+                      const SizedBox(height: 24),
+                      TankToggle(
+                        isOn: isOn,
+                        enabled: canToggle,
+                        busy: tankProvider.isWriting,
+                        onChanged: (value) async {
+                          final success = await context.read<TankProvider>().toggleTank(value);
+                          if (!success && context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Failed to update tank status. Please try again.')),
+                            );
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton.icon(
+                          style: TextButton.styleFrom(foregroundColor: Colors.white),
+                          onPressed: () => Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => const TankControlScreen(),
+                            ),
+                          ),
+                          icon: const Icon(Icons.fullscreen, size: 20),
+                          label: const Text('Open immersive controls'),
                         ),
                       ),
-                      icon: const Icon(Icons.open_in_new),
-                      label: const Text('Open full tank control'),
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 32),
+                Text('Coming next', style: theme.textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 12),
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                    childAspectRatio: 1.15,
+                  ),
+                  itemCount: _features.length,
+                  itemBuilder: (context, index) {
+                    final feature = _features[index];
+                    return CardPlaceholder(
+                      title: feature.title,
+                      description: feature.description,
+                    );
+                  },
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 24),
-          Text('Product roadmap', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 8),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              childAspectRatio: 1.3,
-            ),
-            itemCount: _features.length,
-            itemBuilder: (context, index) {
-              final feature = _features[index];
-              return CardPlaceholder(
-                title: feature.title,
-                description: feature.description,
-              );
-            },
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -172,18 +231,25 @@ class _DisconnectedBanner extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF4E5),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFF97316)),
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFD9C0), Color(0xFFFFEDD5)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFF97316).withOpacity(0.5)),
+        boxShadow: const [
+          BoxShadow(color: Color(0x33F97316), blurRadius: 16, offset: Offset(0, 8)),
+        ],
       ),
       child: Row(
         children: [
-          const Icon(Icons.wifi_off, color: Color(0xFFF97316)),
+          const Icon(Icons.wifi_off, color: Color(0xFF9A3412)),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               message,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: const Color(0xFF9A3412)),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: const Color(0xFF7C2D12), fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -191,6 +257,7 @@ class _DisconnectedBanner extends StatelessWidget {
     );
   }
 }
+
 
 class _FeatureDescription {
   const _FeatureDescription(this.title, this.description);
