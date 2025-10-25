@@ -32,18 +32,21 @@ class DbService {
       updates['status'] = false;
     }
 
-    if (percent is num) {
+    if (legacyLevel is num) {
+      final normalizedLevel = _normalizeLevel(legacyLevel.toDouble());
+      if (normalizedLevel != legacyLevel) {
+        updates['water_level'] = normalizedLevel;
+      }
+    } else if (percent is num) {
       final normalizedPercent = _normalizePercent(percent.toDouble());
-      updates['water_level_percent'] = normalizedPercent;
-      updates['water_level'] = _percentToLevel(normalizedPercent);
-    } else if (legacyLevel is num) {
-      final normalizedLevel = legacyLevel.toDouble().clamp(0, 10);
-      updates['water_level'] = double.parse(normalizedLevel.toStringAsFixed(1));
-      updates['water_level_percent'] =
-          double.parse((normalizedLevel * 10).toStringAsFixed(1));
+      final normalizedLevel = _percentToLevel(normalizedPercent);
+      updates['water_level'] = normalizedLevel;
     } else {
-      updates['water_level_percent'] = 65.0;
       updates['water_level'] = 6.5;
+    }
+
+    if (value.containsKey('water_level_percent')) {
+      updates['water_level_percent'] = null;
     }
 
     if (updatedAt is! num) {
@@ -55,15 +58,15 @@ class DbService {
     }
   }
 
-  Future<void> updateTankState({bool? status, double? waterLevelPercent}) async {
+  Future<void> updateTankState({bool? status, double? waterLevel}) async {
     final updates = <String, Object?>{};
     if (status != null) {
       updates['status'] = status;
     }
-    if (waterLevelPercent != null) {
-      final normalizedPercent = _normalizePercent(waterLevelPercent);
-      updates['water_level_percent'] = normalizedPercent;
-      updates['water_level'] = _percentToLevel(normalizedPercent);
+    if (waterLevel != null) {
+      final normalizedLevel = _normalizeLevel(waterLevel);
+      updates['water_level'] = normalizedLevel;
+      updates['water_level_percent'] = null;
     }
     if (updates.isNotEmpty) {
       updates['updated_at'] = ServerValue.timestamp;
@@ -85,7 +88,6 @@ Map<String, Object?> _defaultTankPayload() {
   return {
     'status': false,
     'water_level': 6.5,
-    'water_level_percent': 65.0,
     'updated_at': ServerValue.timestamp,
   };
 }
@@ -97,5 +99,10 @@ double _percentToLevel(double percent) {
 
 double _normalizePercent(double percent) {
   final normalized = percent.clamp(0, 100);
+  return double.parse(normalized.toStringAsFixed(1));
+}
+
+double _normalizeLevel(double level) {
+  final normalized = level.clamp(0, 10);
   return double.parse(normalized.toStringAsFixed(1));
 }
