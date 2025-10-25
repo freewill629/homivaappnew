@@ -91,7 +91,7 @@ class DashboardScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       WaterLevelGauge(
-                        level: tankProvider.waterLevel,
+                        levelPercent: tankProvider.waterLevelPercent,
                         isConnected: tankProvider.isConnected,
                         isLoading: tankProvider.isLoading && !tankProvider.hasData,
                       ),

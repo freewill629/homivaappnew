@@ -14,7 +14,7 @@ class TankControlScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tankProvider = context.watch<TankProvider>();
-    final level = tankProvider.waterLevel;
+    final levelPercent = tankProvider.waterLevelPercent;
     final isOn = tankProvider.isOn ?? false;
     final updatedAt = _formatTime(tankProvider.updatedAt);
 
@@ -66,7 +66,7 @@ class TankControlScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       WaterLevelGauge(
-                        level: level,
+                        levelPercent: levelPercent,
                         isConnected: tankProvider.isConnected,
                         isLoading: tankProvider.isLoading && !tankProvider.hasData,
                       ),
@@ -89,13 +89,16 @@ class TankControlScreen extends StatelessWidget {
                                 const Icon(Icons.insights, color: Colors.white),
                                 const SizedBox(width: 12),
                                 Text(
-                                  'Optimal range 4.0 – 8.5',
-                                  style: theme.textTheme.titleMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+                                  'Optimal range 45% – 85%',
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                 ),
                               ],
                             ),
                             Text(
-                              level != null ? '${level.toStringAsFixed(1)} m now' : '--',
+                              levelPercent != null ? '${levelPercent.toStringAsFixed(0)}% full' : '--',
                               style: theme.textTheme.titleMedium?.copyWith(color: Colors.white70, fontWeight: FontWeight.w600),
                             ),
                           ],
