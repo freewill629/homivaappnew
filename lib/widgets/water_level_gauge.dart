@@ -6,22 +6,22 @@ import 'live_sync_status.dart';
 
 class WaterLevelGauge extends StatelessWidget {
   const WaterLevelGauge({
-    required this.level,
+    required this.levelPercent,
     required this.isConnected,
     required this.isLoading,
     super.key,
   });
 
-  final double? level;
+  final double? levelPercent;
   final bool isConnected;
   final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
-    final value = level;
-    final pct = value != null ? (value.clamp(0, 10)) / 10.0 : 0.0;
+    final value = levelPercent;
+    final pct = value != null ? value.clamp(0, 100) / 100.0 : 0.0;
     final hasValue = value != null;
-    final formattedLevel = value?.toStringAsFixed(1);
+    final formattedLevel = value != null ? value.toStringAsFixed(0) : null;
     final statusText = isLoading
         ? 'Connecting…'
         : isConnected
@@ -79,7 +79,7 @@ class WaterLevelGauge extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      hasValue ? '$formattedLevel m' : '-- m',
+                      hasValue ? '$formattedLevel%' : '--',
                       style: theme.textTheme.displaySmall?.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,
@@ -88,7 +88,7 @@ class WaterLevelGauge extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'out of 10.0',
+                      'Tank capacity',
                       style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white54),
                     ),
                   ],
