@@ -61,10 +61,10 @@ class TankProvider extends ChangeNotifier {
           }
           if (levelPercent is num) {
             final normalized = levelPercent.toDouble().clamp(0, 100);
-            _waterLevelPercent = normalized.toDouble();
+            _waterLevelPercent = double.parse(normalized.toStringAsFixed(1));
           } else if (legacyLevel is num) {
             final normalized = (legacyLevel.toDouble().clamp(0, 10) / 10.0) * 100.0;
-            _waterLevelPercent = normalized.clamp(0, 100).toDouble();
+            _waterLevelPercent = double.parse(normalized.clamp(0, 100).toStringAsFixed(1));
           }
           final timestamp = raw['updated_at'];
           if (timestamp is num) {
