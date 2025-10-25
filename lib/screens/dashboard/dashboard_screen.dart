@@ -37,16 +37,17 @@ class DashboardScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         children: [
-          if (user != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: Text(
-                'Welcome back, ${user.email}',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-            ),
-          if (tankProvider.error != null)
+          if (tankProvider.error != null) ...[
             _DisconnectedBanner(message: tankProvider.error!),
+            const SizedBox(height: 16),
+          ],
+          if (user != null) ...[
+            Text(
+              'Welcome back, ${user.email}',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 16),
+          ],
           _TankOverviewCard(
             provider: tankProvider,
             updatedAtLabel: updatedAtLabel,
