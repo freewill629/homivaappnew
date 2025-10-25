@@ -59,15 +59,28 @@ class AuthGate extends StatefulWidget {
 }
 
 class _AuthGateState extends State<AuthGate> {
+  String? _listeningForUserId;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final user = context.watch<User?>();
-    if (user != null) {
-      widget.tankProvider.startListening();
-    } else {
-      widget.tankProvider.stopListening();
+    if (_listeningForUserId == user?.uid) {
+      return;
     }
+
+    _listeningForUserId = user?.uid;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      if (user != null) {
+        widget.tankProvider.startListening();
+      } else {
+        widget.tankProvider.stopListening();
+      }
+    });
   }
 
   @override
