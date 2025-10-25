@@ -18,8 +18,8 @@ class TankStatusChip extends StatelessWidget {
         ? const [Color(0xFF34D399), Color(0xFF10B981)]
         : const [Color(0xFFCBD5F5), Color(0xFFA5B4FC)];
     final borderColor = isConnected
-        ? Colors.white.withOpacity(0.4)
-        : Colors.white.withOpacity(0.12);
+        ? Colors.white.withValues(alpha: 0.4)
+        : Colors.white.withValues(alpha: 0.12);
     final label = hasStatus
         ? (isOn ? 'Power ON' : 'Power OFF')
         : 'Awaiting status';
@@ -33,7 +33,7 @@ class TankStatusChip extends StatelessWidget {
         boxShadow: [
           if (hasStatus)
             BoxShadow(
-              color: (isOn ? const Color(0xFF0F766E) : const Color(0xFF312E81)).withOpacity(0.22),
+              color: (isOn ? const Color(0xFF0F766E) : const Color(0xFF312E81)).withValues(alpha: 0.22),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),

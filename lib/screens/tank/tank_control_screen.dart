@@ -30,9 +30,9 @@ class TankControlScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.2)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -105,7 +105,7 @@ class TankControlScreen extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.trending_up, color: Colors.white.withOpacity(0.9)),
+                          Icon(Icons.trending_up, color: Colors.white.withValues(alpha: 0.9)),
                           const SizedBox(width: 8),
                           Text('Trend: Steady', style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white70)),
                         ],
@@ -203,7 +203,7 @@ class _InfoBanner extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFF97316).withOpacity(0.5)),
+        border: Border.all(color: const Color(0xFFF97316).withValues(alpha: 0.5)),
         boxShadow: const [
           BoxShadow(color: Color(0x33F97316), blurRadius: 16, offset: Offset(0, 8)),
         ],

@@ -43,52 +43,52 @@ class TankToggle extends StatelessWidget {
             ],
             showSelectedIcon: false,
             style: ButtonStyle(
-              shape: MaterialStateProperty.all(
+              shape: WidgetStateProperty.all(
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               ),
-              padding: MaterialStateProperty.all(const EdgeInsets.symmetric(horizontal: 20, vertical: 12)),
-              side: MaterialStateProperty.resolveWith(
+              padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 20, vertical: 12)),
+              side: WidgetStateProperty.resolveWith(
                 (states) {
-                  if (states.contains(MaterialState.disabled)) {
+                  if (states.contains(WidgetState.disabled)) {
                     return const BorderSide(color: Color(0x33FFFFFF));
                   }
-                  if (states.contains(MaterialState.selected)) {
+                  if (states.contains(WidgetState.selected)) {
                     return const BorderSide(color: Color(0xFF1E3A8A), width: 1.4);
                   }
                   return const BorderSide(color: Color(0xFFCBD5F5));
                 },
               ),
-              backgroundColor: MaterialStateProperty.resolveWith(
+              backgroundColor: WidgetStateProperty.resolveWith(
                 (states) {
-                  if (states.contains(MaterialState.disabled)) {
-                    return Colors.white.withOpacity(0.08);
+                  if (states.contains(WidgetState.disabled)) {
+                    return Colors.white.withValues(alpha: 0.08);
                   }
-                  if (states.contains(MaterialState.selected)) {
+                  if (states.contains(WidgetState.selected)) {
                     return const Color(0xFFEEF2FF);
                   }
-                  return Colors.white.withOpacity(0.18);
+                  return Colors.white.withValues(alpha: 0.18);
                 },
               ),
-              foregroundColor: MaterialStateProperty.resolveWith(
+              foregroundColor: WidgetStateProperty.resolveWith(
                 (states) {
-                  if (states.contains(MaterialState.disabled)) {
+                  if (states.contains(WidgetState.disabled)) {
                     return Colors.white54;
                   }
-                  if (states.contains(MaterialState.selected)) {
+                  if (states.contains(WidgetState.selected)) {
                     return const Color(0xFF1D4ED8);
                   }
                   return Colors.white;
                 },
               ),
-              textStyle: MaterialStateProperty.all(
+              textStyle: WidgetStateProperty.all(
                 const TextStyle(fontWeight: FontWeight.w600, letterSpacing: 0.2),
               ),
-              iconColor: MaterialStateProperty.resolveWith(
+              iconColor: WidgetStateProperty.resolveWith(
                 (states) {
-                  if (states.contains(MaterialState.disabled)) {
+                  if (states.contains(WidgetState.disabled)) {
                     return Colors.white54;
                   }
-                  return states.contains(MaterialState.selected) ? const Color(0xFF2563EB) : Colors.white70;
+                  return states.contains(WidgetState.selected) ? const Color(0xFF2563EB) : Colors.white70;
                 },
               ),
             ),
@@ -100,7 +100,7 @@ class TankToggle extends StatelessWidget {
           Container(
             height: 56,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.65),
+              color: Colors.white.withValues(alpha: 0.65),
               borderRadius: BorderRadius.circular(12),
             ),
             alignment: Alignment.center,

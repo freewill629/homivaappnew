@@ -68,9 +68,9 @@ class WaterLevelGauge extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.12),
+                        color: Colors.white.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: Colors.white.withOpacity(0.18)),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
                       ),
                       child: Text(
                         isConnected ? 'Live' : 'Standby',
