@@ -2,15 +2,30 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import 'live_sync_status.dart';
+
 class WaterLevelGauge extends StatelessWidget {
-  const WaterLevelGauge({required this.level, super.key});
+  const WaterLevelGauge({
+    required this.level,
+    required this.isConnected,
+    required this.isLoading,
+    super.key,
+  });
 
   final double? level;
+  final bool isConnected;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
     final value = level;
     final pct = value != null ? (value.clamp(0, 10)) / 10.0 : 0.0;
+    final hasValue = value != null;
+    final statusText = isLoading
+        ? 'Connecting…'
+        : isConnected
+            ? 'Live · syncing'
+            : 'Offline';
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -24,13 +39,11 @@ class WaterLevelGauge extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    value != null ? value.toStringAsFixed(1) : '--',
-                    style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'of 10',
-                    style: Theme.of(context).textTheme.titleMedium,
+                    hasValue ? '${value!.toStringAsFixed(1)} / 10' : '-- / 10',
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineMedium
+                        ?.copyWith(fontWeight: FontWeight.w700, letterSpacing: -0.5),
                   ),
                 ],
               ),
@@ -42,6 +55,8 @@ class WaterLevelGauge extends StatelessWidget {
           'Water Level',
           style: Theme.of(context).textTheme.titleMedium,
         ),
+        const SizedBox(height: 8),
+        LiveSyncStatus(label: statusText, isActive: isConnected && !isLoading),
       ],
     );
   }

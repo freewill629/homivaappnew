@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/auth_service.dart';
+import '../../widgets/homiva_logo.dart';
 import '../../widgets/primary_button.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -57,15 +58,43 @@ class _LoginScreenState extends State<LoginScreen> {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
+            constraints: const BoxConstraints(maxWidth: 440),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Homiva', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const HomivaLogo(size: 56),
+                    const SizedBox(width: 16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Homiva',
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineMedium
+                              ?.copyWith(fontWeight: FontWeight.w700, letterSpacing: -0.5),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Smart Water Tank Control',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 32),
                 Text(
-                  'Smart Water Tank Control',
-                  style: Theme.of(context).textTheme.titleMedium,
+                  _isLogin ? 'Sign in' : 'Create account',
+                  style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Access your connected tank anywhere, anytime.',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.black54),
                 ),
                 const SizedBox(height: 32),
                 Card(
@@ -76,8 +105,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(_isLogin ? 'Sign in to continue' : 'Create your account',
-                              style: Theme.of(context).textTheme.titleMedium),
+                          Text(
+                            _isLogin ? 'Sign in to continue' : 'We just need a few details',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
                           const SizedBox(height: 24),
                           TextFormField(
                             controller: _emailController,
@@ -137,6 +168,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       ),
                     ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Center(
+                  child: Text(
+                    'By continuing you accept our Terms',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.black54),
                   ),
                 ),
               ],
