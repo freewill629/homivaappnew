@@ -27,18 +27,24 @@ class TankToggle extends StatelessWidget {
       alignment: Alignment.center,
       children: [
         SizedBox(
-          height: 56,
+          height: 72,
           child: SegmentedButton<bool>(
             segments: const [
               ButtonSegment(
                 value: false,
-                label: Text('Power off'),
                 icon: Icon(Icons.power_settings_new),
+                label: _SegmentContent(
+                  title: 'Pump off',
+                  subtitle: 'Stops water flow',
+                ),
               ),
               ButtonSegment(
                 value: true,
-                label: Text('Power on'),
                 icon: Icon(Icons.bolt),
+                label: _SegmentContent(
+                  title: 'Pump on',
+                  subtitle: 'Starts pumping now',
+                ),
               ),
             ],
             showSelectedIcon: false,
@@ -46,7 +52,9 @@ class TankToggle extends StatelessWidget {
               shape: WidgetStateProperty.all(
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               ),
-              padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 20, vertical: 12)),
+              padding: WidgetStateProperty.all(
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              ),
               side: WidgetStateProperty.resolveWith(
                 (states) {
                   if (states.contains(WidgetState.disabled)) {
@@ -80,9 +88,6 @@ class TankToggle extends StatelessWidget {
                   return Colors.white;
                 },
               ),
-              textStyle: WidgetStateProperty.all(
-                const TextStyle(fontWeight: FontWeight.w600, letterSpacing: 0.2),
-              ),
               iconColor: WidgetStateProperty.resolveWith(
                 (states) {
                   if (states.contains(WidgetState.disabled)) {
@@ -98,7 +103,7 @@ class TankToggle extends StatelessWidget {
         ),
         if (busy)
           Container(
-            height: 56,
+            height: 72,
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.65),
               borderRadius: BorderRadius.circular(12),
@@ -110,6 +115,39 @@ class TankToggle extends StatelessWidget {
               child: CircularProgressIndicator(strokeWidth: 2),
             ),
           ),
+      ],
+    );
+  }
+}
+
+class _SegmentContent extends StatelessWidget {
+  const _SegmentContent({required this.title, required this.subtitle});
+
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.1,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          subtitle,
+          style: TextStyle(
+            fontSize: 11,
+            color: Colors.white.withValues(alpha: 0.85),
+            letterSpacing: 0.1,
+          ),
+        ),
       ],
     );
   }

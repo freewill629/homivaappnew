@@ -124,7 +124,7 @@ class TankControlScreen extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            'Tank power orchestration',
+                            'Pump power control',
                             style: theme.textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w700),
                           ),
                           const Spacer(),
@@ -143,10 +143,15 @@ class TankControlScreen extends StatelessWidget {
                         activeDotColor: const Color(0xFF34D399),
                         inactiveDotColor: Colors.white24,
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 12),
                       Text(
                         'Updated: $updatedAt',
                         style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white60),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Toggle the pump without leaving the dashboard. Smart safeguards avoid rapid switching and keep relays healthy.',
+                        style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white70),
                       ),
                       const SizedBox(height: 24),
                       TankToggle(
