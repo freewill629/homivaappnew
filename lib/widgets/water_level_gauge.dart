@@ -135,10 +135,10 @@ class _WaterLevelGaugeState extends State<WaterLevelGauge>
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.12),
+                                color: Colors.white.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
-                                  color: Colors.white.withOpacity(0.18),
+                                  color: Colors.white.withValues(alpha: 0.18),
                                 ),
                               ),
                               child: Text(
@@ -176,7 +176,7 @@ class _WaterLevelGaugeState extends State<WaterLevelGauge>
                             alignment: Alignment.bottomCenter,
                             child: Icon(
                               Icons.water_drop,
-                              color: Colors.white.withOpacity(0.6),
+                              color: Colors.white.withValues(alpha: 0.6),
                               size: 24,
                             ),
                           ),
@@ -224,7 +224,7 @@ class _TankShell extends StatelessWidget {
           colors: [Color(0xFF0B1224), Color(0xFF172554)],
         ),
         border: Border.all(
-          color: Colors.white.withOpacity(0.18),
+          color: Colors.white.withValues(alpha: 0.18),
           width: 1.4,
         ),
         boxShadow: const [
@@ -302,7 +302,7 @@ class _WaterFillPainter extends CustomPainter {
     canvas.drawPath(wavePath, fillPaint);
 
     final foamPaint = Paint()
-      ..color = Colors.white.withOpacity(0.12)
+      ..color = Colors.white.withValues(alpha: 0.12)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 
