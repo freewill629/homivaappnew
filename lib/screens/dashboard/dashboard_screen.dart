@@ -126,7 +126,7 @@ class DashboardScreen extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Text('Tank power orchestration', style: theme.textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w700)),
+                          Text('Pump power control', style: theme.textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w700)),
                           const Spacer(),
                           TankStatusChip(
                             isOn: isOn,
@@ -145,7 +145,7 @@ class DashboardScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Remote switching updates the ESP32 relay instantly. Your hardware stays protected with software interlocks.',
+                        'Switch the pump on or off instantly from anywhere. Built-in safety checks prevent rapid toggles and protect your hardware.',
                         style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white70),
                       ),
                       const SizedBox(height: 24),
