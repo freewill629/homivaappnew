@@ -15,7 +15,11 @@ class TankControlScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final tankProvider = context.watch<TankProvider>();
     final levelPercent = tankProvider.waterLevelPercent;
-    final isOn = tankProvider.isOn ?? false;
+    final motorIsOn = tankProvider.isOn ?? false;
+    final manualMode = tankProvider.manualControlEnabled;
+    final manualModeKnown = manualMode != null;
+    final manualModeEnabled = manualMode ?? false;
+    final manualCommand = tankProvider.manualCommand ?? false;
     final updatedAt = _formatTime(tankProvider.updatedAt);
 
     final theme = Theme.of(context);
@@ -129,7 +133,7 @@ class TankControlScreen extends StatelessWidget {
                           ),
                           const Spacer(),
                           TankStatusChip(
-                            isOn: isOn,
+                            isOn: motorIsOn,
                             hasStatus: tankProvider.hasStatus,
                             isConnected: tankProvider.isConnected,
                           ),
@@ -150,26 +154,86 @@ class TankControlScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Toggle the pump without leaving the dashboard. Smart safeguards avoid rapid switching and keep relays healthy.',
+                        manualModeEnabled
+                            ? 'Send manual commands with confidence. Smart safeguards avoid rapid switching and keep relays healthy.'
+                            : 'Automatic scheduling is in control. Enable manual mode to send pump commands from here.',
                         style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white70),
                       ),
                       const SizedBox(height: 24),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Manual mode',
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'When enabled you can override the controller directly from this panel.',
+                                  style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70),
+                                ),
+                              ],
+                            ),
+                          ),
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 200),
+                            child: tankProvider.isUpdatingManualControl
+                                ? const SizedBox(
+                                    height: 28,
+                                    width: 28,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  )
+                                : Switch(
+                                    value: manualModeEnabled,
+                                    onChanged: manualModeKnown
+                                        ? (value) async {
+                                            final success =
+                                                await context.read<TankProvider>().toggleManualControl(value);
+                                            if (!success && context.mounted) {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    value
+                                                        ? 'Unable to enable manual mode. Please try again.'
+                                                        : 'Unable to disable manual mode. Please try again.',
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          }
+                                        : null,
+                                    activeColor: Colors.white,
+                                    activeTrackColor: const Color(0xFF2563EB),
+                                    inactiveThumbColor: Colors.white70,
+                                    inactiveTrackColor: Colors.white24,
+                                  ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
                       TankToggle(
-                        isOn: isOn,
+                        isOn: manualCommand,
                         enabled: tankProvider.canControl && !tankProvider.isWriting,
                         busy: tankProvider.isWriting,
                         onChanged: (value) async {
                           final success = await context.read<TankProvider>().toggleTank(value);
                           if (!success && context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Failed to update tank status. Please try again.')),
+                              const SnackBar(content: Text('Failed to update pump command. Please try again.')),
                             );
                           }
                         },
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'This control writes directly to /tank/status in Firebase Realtime Database.',
+                        'This control writes directly to /tank/manual_command in Firebase Realtime Database.',
                         style: theme.textTheme.bodySmall?.copyWith(color: Colors.white54),
                       ),
                     ],
