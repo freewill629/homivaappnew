@@ -233,7 +233,7 @@ class TankControlScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'This control writes directly to /tank/manual_command in Firebase Realtime Database.',
+                        'This control writes directly to /data/manual_command in Firebase Realtime Database.',
                         style: theme.textTheme.bodySmall?.copyWith(color: Colors.white54),
                       ),
                     ],
