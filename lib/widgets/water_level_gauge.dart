@@ -68,7 +68,7 @@ class _WaterLevelGaugeState extends State<WaterLevelGauge>
       curve: Curves.easeOutCubic,
       onEnd: () => _previousLevel = targetLevel,
       builder: (context, animatedPercent, _) {
-        final normalized = (animatedPercent.clamp(0, 100)) / 100;
+        final normalized = (animatedPercent / 100).clamp(0.0, 1.0);
         final formattedLevel = hasValue
             ? animatedPercent.clamp(0, 100).toStringAsFixed(0)
             : '--';

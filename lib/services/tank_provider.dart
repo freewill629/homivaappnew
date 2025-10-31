@@ -54,12 +54,12 @@ class TankProvider extends ChangeNotifier {
     _error = null;
     notifyListeners();
     try {
-      await _db.ensureTankDataExists();
+      await _db.ensureDataExists();
     } catch (e) {
       _error = 'Failed to initialize tank data';
       notifyListeners();
     }
-    _subscription = _db.tankRef.onValue.listen(
+    _subscription = _db.dataRef.onValue.listen(
       (event) {
         final raw = event.snapshot.value;
         if (raw is Map<dynamic, dynamic>) {
@@ -246,6 +246,6 @@ bool? _parseMotorState(Object? value) {
 double _distanceToPercent(double distanceCm) {
   const totalHeight = 10.0;
   final clamped = distanceCm.clamp(0, totalHeight);
-  final percent = ((totalHeight - clamped) / totalHeight) * 100;
+  final percent = (totalHeight - clamped) * 10;
   return percent.clamp(0, 100);
 }

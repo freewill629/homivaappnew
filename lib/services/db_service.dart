@@ -7,18 +7,18 @@ class DbService {
 
   final FirebaseDatabase _database;
 
-  DatabaseReference get tankRef => _database.ref('tank');
+  DatabaseReference get dataRef => _database.ref('data');
 
-  Future<void> ensureTankDataExists() async {
-    final snapshot = await tankRef.get();
+  Future<void> ensureDataExists() async {
+    final snapshot = await dataRef.get();
     if (!snapshot.exists) {
-      await tankRef.set(_defaultTankPayload());
+      await dataRef.set(_defaultDataPayload());
       return;
     }
 
     final value = snapshot.value;
     if (value is! Map) {
-      await tankRef.set(_defaultTankPayload());
+      await dataRef.set(_defaultDataPayload());
       return;
     }
 
@@ -70,12 +70,12 @@ class DbService {
     }
 
     if (updates.isNotEmpty) {
-      await tankRef.update(updates);
+      await dataRef.update(updates);
     }
   }
 
   Future<void> setManualControl(bool enabled) async {
-    await tankRef.update({
+    await dataRef.update({
       'manual_control': enabled ? 1 : 0,
       if (!enabled) 'manual_command': 0,
       'updated_at': ServerValue.timestamp,
@@ -83,7 +83,7 @@ class DbService {
   }
 
   Future<void> setManualCommand(bool enabled) async {
-    await tankRef.update({
+    await dataRef.update({
       'manual_command': enabled ? 1 : 0,
       'updated_at': ServerValue.timestamp,
     });
@@ -99,7 +99,7 @@ FirebaseDatabase _resolveDatabase(FirebaseApp? app) {
   return FirebaseDatabase.instanceFor(app: resolvedApp);
 }
 
-Map<String, Object?> _defaultTankPayload() {
+Map<String, Object?> _defaultDataPayload() {
   return {
     'distance_cm': 10.0,
     'manual_control': 0,
