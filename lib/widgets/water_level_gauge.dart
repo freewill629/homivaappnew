@@ -70,7 +70,7 @@ class _WaterLevelGaugeState extends State<WaterLevelGauge>
       builder: (context, animatedPercent, _) {
         final normalized = (animatedPercent / 100).clamp(0.0, 1.0);
         final formattedLevel = hasValue
-            ? animatedPercent.clamp(0, 100).toStringAsFixed(0)
+            ? animatedPercent.clamp(0, 1000).toStringAsFixed(0)
             : '--';
         return Column(
           mainAxisSize: MainAxisSize.min,
