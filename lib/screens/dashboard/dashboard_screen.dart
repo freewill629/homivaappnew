@@ -21,7 +21,11 @@ class DashboardScreen extends StatelessWidget {
     final user = context.watch<User?>();
     final tankProvider = context.watch<TankProvider>();
     final updatedAtLabel = _formatTime(tankProvider.updatedAt);
-    final isOn = tankProvider.isOn ?? false;
+    final motorIsOn = tankProvider.isOn ?? false;
+    final manualMode = tankProvider.manualControlEnabled;
+    final manualCommand = tankProvider.manualCommand ?? false;
+    final manualModeKnown = manualMode != null;
+    final manualModeEnabled = manualMode ?? false;
     final canToggle = tankProvider.canControl && !tankProvider.isWriting;
 
     final theme = Theme.of(context);
@@ -129,7 +133,7 @@ class DashboardScreen extends StatelessWidget {
                           Text('Pump power control', style: theme.textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w700)),
                           const Spacer(),
                           TankStatusChip(
-                            isOn: isOn,
+                            isOn: motorIsOn,
                             hasStatus: tankProvider.hasStatus,
                             isConnected: tankProvider.isConnected,
                           ),
@@ -144,20 +148,98 @@ class DashboardScreen extends StatelessWidget {
                         inactiveDotColor: Colors.white24,
                       ),
                       const SizedBox(height: 12),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Manual mode',
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Enable to override automatic pump control.',
+                                  style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70),
+                                ),
+                              ],
+                            ),
+                          ),
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 200),
+                            child: tankProvider.isUpdatingManualControl
+                                ? const SizedBox(
+                                    height: 28,
+                                    width: 28,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  )
+                                : Switch(
+                                    value: manualModeEnabled,
+                                    onChanged: manualModeKnown
+                                        ? (value) async {
+                                            final success =
+                                                await context.read<TankProvider>().toggleManualControl(value);
+                                            if (!success && context.mounted) {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    value
+                                                        ? 'Unable to enable manual mode. Please try again.'
+                                                        : 'Unable to disable manual mode. Please try again.',
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          }
+                                        : null,
+                                    thumbColor: WidgetStateProperty.resolveWith(
+                                      (states) {
+                                        if (states.contains(WidgetState.disabled)) {
+                                          return Colors.white54;
+                                        }
+                                        if (states.contains(WidgetState.selected)) {
+                                          return Colors.white;
+                                        }
+                                        return Colors.white70;
+                                      },
+                                    ),
+                                    trackColor: WidgetStateProperty.resolveWith(
+                                      (states) {
+                                        if (states.contains(WidgetState.disabled)) {
+                                          return Colors.white24;
+                                        }
+                                        if (states.contains(WidgetState.selected)) {
+                                          return const Color(0xFF2563EB);
+                                        }
+                                        return Colors.white24;
+                                      },
+                                    ),
+                                  ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
                       Text(
-                        'Switch the pump on or off instantly from anywhere. Built-in safety checks prevent rapid toggles and protect your hardware.',
+                        manualModeEnabled
+                            ? 'Switch the pump on or off instantly. Manual commands override the controller while this mode is active.'
+                            : 'Automatic safety is active. Turn on manual mode to control the pump from the app.',
                         style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white70),
                       ),
                       const SizedBox(height: 24),
                       TankToggle(
-                        isOn: isOn,
+                        isOn: manualCommand,
                         enabled: canToggle,
                         busy: tankProvider.isWriting,
                         onChanged: (value) async {
                           final success = await context.read<TankProvider>().toggleTank(value);
                           if (!success && context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Failed to update tank status. Please try again.')),
+                              const SnackBar(content: Text('Failed to update pump command. Please try again.')),
                             );
                           }
                         },
