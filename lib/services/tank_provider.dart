@@ -247,5 +247,5 @@ double _distanceToPercent(double distanceCm) {
   const totalHeight = 10.0;
   final clamped = distanceCm.clamp(0, totalHeight);
   final percent = (totalHeight - clamped) * 10;
-  return percent.clamp(0, 1000);
+  return percent.clamp(0, 100);
 }
