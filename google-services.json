@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "814599800607",
+    "firebase_url": "https://smartwatertank-3efdd-default-rtdb.firebaseio.com",
+    "project_id": "smartwatertank-3efdd",
+    "storage_bucket": "smartwatertank-3efdd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:814599800607:android:93fe629edaf90aa594d22a",
+        "android_client_info": {
+          "package_name": "com.homiva.smarttank"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIc78rxqia0zcf90dglcGdbIpSMpZXq1w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
