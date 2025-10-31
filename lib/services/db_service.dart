@@ -23,30 +23,46 @@ class DbService {
     }
 
     final updates = <String, Object?>{};
-    final status = value['status'];
-    final percent = value['water_level_percent'];
-    final legacyLevel = value['water_level'];
+    final distance = value['distance_cm'];
+    final manualControl = value['manual_control'];
+    final manualCommand = value['manual_command'];
+    final motorState = value['motor_state'];
     final updatedAt = value['updated_at'];
 
-    if (status is! bool) {
-      updates['status'] = false;
-    }
-
-    if (legacyLevel is num) {
-      final normalizedLevel = _normalizeLevel(legacyLevel.toDouble());
-      if (normalizedLevel != legacyLevel) {
-        updates['water_level'] = normalizedLevel;
+    if (distance is num) {
+      final normalized = _normalizeDistance(distance.toDouble());
+      if (normalized != distance) {
+        updates['distance_cm'] = normalized;
       }
-    } else if (percent is num) {
-      final normalizedPercent = _normalizePercent(percent.toDouble());
-      final normalizedLevel = _percentToLevel(normalizedPercent);
-      updates['water_level'] = normalizedLevel;
     } else {
-      updates['water_level'] = 6.5;
+      updates['distance_cm'] = 10.0;
     }
 
-    if (value.containsKey('water_level_percent')) {
-      updates['water_level_percent'] = null;
+    final normalizedManualControl = _coerceToIntFlag(manualControl);
+    if (normalizedManualControl != null) {
+      if (manualControl != normalizedManualControl) {
+        updates['manual_control'] = normalizedManualControl;
+      }
+    } else {
+      updates['manual_control'] = 0;
+    }
+
+    final normalizedManualCommand = _coerceToIntFlag(manualCommand);
+    if (normalizedManualCommand != null) {
+      if (manualCommand != normalizedManualCommand) {
+        updates['manual_command'] = normalizedManualCommand;
+      }
+    } else {
+      updates['manual_command'] = 0;
+    }
+
+    if (motorState is String) {
+      final normalized = _normalizeMotorState(motorState);
+      if (motorState != normalized) {
+        updates['motor_state'] = normalized;
+      }
+    } else {
+      updates['motor_state'] = 'OFF';
     }
 
     if (updatedAt is! num) {
@@ -58,20 +74,19 @@ class DbService {
     }
   }
 
-  Future<void> updateTankState({bool? status, double? waterLevel}) async {
-    final updates = <String, Object?>{};
-    if (status != null) {
-      updates['status'] = status;
-    }
-    if (waterLevel != null) {
-      final normalizedLevel = _normalizeLevel(waterLevel);
-      updates['water_level'] = normalizedLevel;
-      updates['water_level_percent'] = null;
-    }
-    if (updates.isNotEmpty) {
-      updates['updated_at'] = ServerValue.timestamp;
-      await tankRef.update(updates);
-    }
+  Future<void> setManualControl(bool enabled) async {
+    await tankRef.update({
+      'manual_control': enabled ? 1 : 0,
+      if (!enabled) 'manual_command': 0,
+      'updated_at': ServerValue.timestamp,
+    });
+  }
+
+  Future<void> setManualCommand(bool enabled) async {
+    await tankRef.update({
+      'manual_command': enabled ? 1 : 0,
+      'updated_at': ServerValue.timestamp,
+    });
   }
 }
 
@@ -86,23 +101,45 @@ FirebaseDatabase _resolveDatabase(FirebaseApp? app) {
 
 Map<String, Object?> _defaultTankPayload() {
   return {
-    'status': false,
-    'water_level': 6.5,
+    'distance_cm': 10.0,
+    'manual_control': 0,
+    'manual_command': 0,
+    'motor_state': 'OFF',
     'updated_at': ServerValue.timestamp,
   };
 }
 
-double _percentToLevel(double percent) {
-  final normalized = percent.clamp(0, 100) / 10.0;
-  return double.parse(normalized.toStringAsFixed(1));
+double _normalizeDistance(double value) {
+  final normalized = value.clamp(0, 10);
+  return double.parse(normalized.toStringAsFixed(2));
 }
 
-double _normalizePercent(double percent) {
-  final normalized = percent.clamp(0, 100);
-  return double.parse(normalized.toStringAsFixed(1));
+String _normalizeMotorState(String raw) {
+  final upper = raw.trim().toUpperCase();
+  if (upper == 'ON') {
+    return 'ON';
+  }
+  if (upper == 'OFF') {
+    return 'OFF';
+  }
+  return upper.isNotEmpty ? upper : 'OFF';
 }
 
-double _normalizeLevel(double level) {
-  final normalized = level.clamp(0, 10);
-  return double.parse(normalized.toStringAsFixed(1));
+int? _coerceToIntFlag(Object? value) {
+  if (value is num) {
+    return value != 0 ? 1 : 0;
+  }
+  if (value is bool) {
+    return value ? 1 : 0;
+  }
+  if (value is String) {
+    final normalized = value.trim().toLowerCase();
+    if (normalized == '1' || normalized == 'true' || normalized == 'on') {
+      return 1;
+    }
+    if (normalized == '0' || normalized == 'false' || normalized == 'off') {
+      return 0;
+    }
+  }
+  return null;
 }

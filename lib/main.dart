@@ -7,13 +7,13 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: const FirebaseOptions(
-      apiKey: 'AIzaSyCh1rISQVZzXbIZ_diIOYb88RnZOChgVqE',
-      authDomain: 'homiva-63bb7.firebaseapp.com',
-      projectId: 'homiva-63bb7',
-      storageBucket: 'homiva-63bb7.firebasestorage.app',
-      messagingSenderId: '823522876319',
-      appId: '1:823522876319:web:9a95916e6d85e6abd63baa',
-      databaseURL: 'https://homiva-63bb7-default-rtdb.asia-southeast1.firebasedatabase.app',
+      apiKey: 'AIzaSyAoLf8Jvi4M5MMdCMjvZasl1uWuWlgeQhE',
+      authDomain: 'smartwatertank-3efdd.firebaseapp.com',
+      projectId: 'smartwatertank-3efdd',
+      storageBucket: 'smartwatertank-3efdd.firebasestorage.app',
+      messagingSenderId: '814599800607',
+      appId: '1:814599800607:web:bfcb3547eccf538294d22a',
+      databaseURL: 'https://smartwatertank-3efdd-default-rtdb.firebaseio.com',
     ),
   );
   runApp(const HomivaApp());
