@@ -209,28 +209,10 @@ class TankControlScreen extends StatelessWidget {
                                             }
                                           }
                                         : null,
-                                    thumbColor: WidgetStateProperty.resolveWith(
-                                      (states) {
-                                        if (states.contains(WidgetState.disabled)) {
-                                          return Colors.white54;
-                                        }
-                                        if (states.contains(WidgetState.selected)) {
-                                          return Colors.white;
-                                        }
-                                        return Colors.white70;
-                                      },
-                                    ),
-                                    trackColor: WidgetStateProperty.resolveWith(
-                                      (states) {
-                                        if (states.contains(WidgetState.disabled)) {
-                                          return Colors.white24;
-                                        }
-                                        if (states.contains(WidgetState.selected)) {
-                                          return const Color(0xFF2563EB);
-                                        }
-                                        return Colors.white24;
-                                      },
-                                    ),
+                                    activeColor: Colors.white,
+                                    activeTrackColor: const Color(0xFF2563EB),
+                                    inactiveThumbColor: Colors.white70,
+                                    inactiveTrackColor: Colors.white24,
                                   ),
                           ),
                         ],
