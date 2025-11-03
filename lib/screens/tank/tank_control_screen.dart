@@ -24,28 +24,20 @@ class TankControlScreen extends StatelessWidget {
 
     final theme = Theme.of(context);
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Row(
+        titleSpacing: 24,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.tungsten, color: Colors.white),
-                  const SizedBox(width: 8),
-                  Text('Tank control', style: theme.textTheme.titleMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.w700)),
-                ],
-              ),
+            Text(
+              'Tank controls',
+              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Fine tune your tank with live automation overrides.',
+              style: theme.textTheme.bodyMedium?.copyWith(color: const Color(0xFF64748B)),
             ),
           ],
         ),
@@ -53,14 +45,14 @@ class TankControlScreen extends StatelessWidget {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF0F172A), Color(0xFF1E3A8A), Color(0xFF312E81)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            colors: [Color(0xFFF8FAFF), Color(0xFFEFF3FF)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
         ),
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 40),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -68,54 +60,69 @@ class TankControlScreen extends StatelessWidget {
                   _InfoBanner(message: tankProvider.error!),
                 GlassContainer(
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary.withOpacity(0.08),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Icon(Icons.insights_outlined, color: theme.colorScheme.primary),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Water level overview',
+                                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Live readings refresh automatically every few seconds.',
+                                  style: theme.textTheme.bodyMedium?.copyWith(color: const Color(0xFF64748B)),
+                                ),
+                              ],
+                            ),
+                          ),
+                          TankStatusChip(
+                            isOn: motorIsOn,
+                            hasStatus: tankProvider.hasStatus,
+                            isConnected: tankProvider.isConnected,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
                       WaterLevelGauge(
                         levelPercent: levelPercent,
                         isConnected: tankProvider.isConnected,
                         isLoading: tankProvider.isLoading && !tankProvider.hasData,
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 20),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(24),
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF38BDF8), Color(0xFF6366F1)],
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                          ),
+                          borderRadius: BorderRadius.circular(20),
+                          color: const Color(0xFFEEF2FF),
                         ),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                const Icon(Icons.insights, color: Colors.white),
-                                const SizedBox(width: 12),
-                                Text(
-                                  'Optimal range 45% – 85%',
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                ),
-                              ],
-                            ),
-                            Text(
-                              levelPercent != null ? '${levelPercent.toStringAsFixed(0)}% full' : '--',
-                              style: theme.textTheme.titleMedium?.copyWith(color: Colors.white70, fontWeight: FontWeight.w600),
+                            Icon(Icons.auto_graph_outlined, color: theme.colorScheme.primary),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                levelPercent != null
+                                    ? 'Current fill level at ${levelPercent.toStringAsFixed(0)}% · Optimal range 45% – 85%'
+                                    : 'Optimal range 45% – 85% when readings resume',
+                                style: theme.textTheme.bodyMedium?.copyWith(color: const Color(0xFF475569)),
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.trending_up, color: Colors.white.withValues(alpha: 0.9)),
-                          const SizedBox(width: 8),
-                          Text('Trend: Steady', style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white70)),
-                        ],
                       ),
                     ],
                   ),
@@ -126,40 +133,46 @@ class TankControlScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text(
-                            'Pump power control',
-                            style: theme.textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w700),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Power command center',
+                                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  'Send overrides instantly or let automation take control.',
+                                  style: theme.textTheme.bodyMedium?.copyWith(color: const Color(0xFF64748B)),
+                                ),
+                              ],
+                            ),
                           ),
-                          const Spacer(),
-                          TankStatusChip(
-                            isOn: motorIsOn,
-                            hasStatus: tankProvider.hasStatus,
-                            isConnected: tankProvider.isConnected,
+                          LiveSyncStatus(
+                            label: tankProvider.isConnected ? 'Live · syncing' : 'Awaiting connection',
+                            isActive: tankProvider.isConnected,
+                            color: const Color(0xFF475569),
+                            activeDotColor: theme.colorScheme.primary,
+                            inactiveDotColor: const Color(0xFFCBD5F5),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
-                      LiveSyncStatus(
-                        label: tankProvider.isConnected ? 'Live · syncing' : 'Awaiting connection',
-                        isActive: tankProvider.isConnected,
-                        color: Colors.white70,
-                        activeDotColor: const Color(0xFF34D399),
-                        inactiveDotColor: Colors.white24,
-                      ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 18),
                       Text(
                         'Updated: $updatedAt',
-                        style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white60),
+                        style: theme.textTheme.bodyMedium?.copyWith(color: const Color(0xFF94A3B8)),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 18),
                       Text(
                         manualModeEnabled
-                            ? 'Send manual commands with confidence. Smart safeguards avoid rapid switching and keep relays healthy.'
-                            : 'Automatic scheduling is in control. Enable manual mode to send pump commands from here.',
-                        style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white70),
+                            ? 'Manual overrides are active. Commands will write directly to the controller.'
+                            : 'Automatic scheduling manages your pump. Enable manual mode to issue commands here.',
+                        style: theme.textTheme.bodyMedium?.copyWith(color: const Color(0xFF64748B)),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 20),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -169,15 +182,12 @@ class TankControlScreen extends StatelessWidget {
                               children: [
                                 Text(
                                   'Manual mode',
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
                                 ),
-                                const SizedBox(height: 4),
+                                const SizedBox(height: 6),
                                 Text(
-                                  'When enabled you can override the controller directly from this panel.',
-                                  style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70),
+                                  'Override automation temporarily to test or service hardware.',
+                                  style: theme.textTheme.bodySmall?.copyWith(color: const Color(0xFF94A3B8)),
                                 ),
                               ],
                             ),
@@ -185,10 +195,13 @@ class TankControlScreen extends StatelessWidget {
                           AnimatedSwitcher(
                             duration: const Duration(milliseconds: 200),
                             child: tankProvider.isUpdatingManualControl
-                                ? const SizedBox(
+                                ? SizedBox(
                                     height: 28,
                                     width: 28,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation(theme.colorScheme.primary),
+                                    ),
                                   )
                                 : Switch(
                                     value: manualModeEnabled,
@@ -209,10 +222,7 @@ class TankControlScreen extends StatelessWidget {
                                             }
                                           }
                                         : null,
-                                    activeColor: Colors.white,
-                                    activeTrackColor: const Color(0xFF2563EB),
-                                    inactiveThumbColor: Colors.white70,
-                                    inactiveTrackColor: Colors.white24,
+                                    activeColor: theme.colorScheme.primary,
                                   ),
                           ),
                         ],
@@ -234,7 +244,7 @@ class TankControlScreen extends StatelessWidget {
                       const SizedBox(height: 16),
                       Text(
                         'This control writes directly to /data/manual_command in Firebase Realtime Database.',
-                        style: theme.textTheme.bodySmall?.copyWith(color: Colors.white54),
+                        style: theme.textTheme.bodySmall?.copyWith(color: const Color(0xFF94A3B8)),
                       ),
                     ],
                   ),
@@ -265,29 +275,33 @@ class _InfoBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFFFFD9C0), Color(0xFFFFEDD5)],
+          colors: [Color(0xFFFFF4D6), Color(0xFFFFEDD5)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFF97316).withValues(alpha: 0.5)),
+        border: Border.all(color: const Color(0xFFFBBF24).withOpacity(0.35)),
         boxShadow: const [
-          BoxShadow(color: Color(0x33F97316), blurRadius: 16, offset: Offset(0, 8)),
+          BoxShadow(color: Color(0x22F59E0B), blurRadius: 16, offset: Offset(0, 8)),
         ],
       ),
       child: Row(
         children: [
-          const Icon(Icons.wifi_off, color: Color(0xFF9A3412)),
+          const Icon(Icons.wifi_off, color: Color(0xFFB45309)),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               message,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: const Color(0xFF7C2D12), fontWeight: FontWeight.w600),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: const Color(0xFF92400E),
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -295,4 +309,3 @@ class _InfoBanner extends StatelessWidget {
     );
   }
 }
-

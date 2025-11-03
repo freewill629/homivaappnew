@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 class GlassContainer extends StatelessWidget {
@@ -8,35 +6,34 @@ class GlassContainer extends StatelessWidget {
     super.key,
     this.padding = const EdgeInsets.all(24),
     this.borderRadius = 28,
-    this.opacity = 0.12,
   });
 
   final Widget child;
   final EdgeInsetsGeometry padding;
   final double borderRadius;
-  final double opacity;
 
   @override
   Widget build(BuildContext context) {
-    final borderOpacity = ((opacity + 0.04).clamp(0.0, 1.0)).toDouble();
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-        child: Container(
-          width: double.infinity,
-          padding: padding,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: opacity),
-            borderRadius: BorderRadius.circular(borderRadius),
-            border: Border.all(color: Colors.white.withValues(alpha: borderOpacity)),
-            boxShadow: const [
-              BoxShadow(color: Color(0x33000000), blurRadius: 20, offset: Offset(0, 12)),
-            ],
-          ),
-          child: child,
+    return Container(
+      width: double.infinity,
+      padding: padding,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFFFFF), Color(0xFFF3F6FF)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
+        borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(color: const Color(0xFFE3E8FF)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x1A4455AA),
+            blurRadius: 30,
+            offset: Offset(0, 24),
+          ),
+        ],
       ),
+      child: child,
     );
   }
 }

@@ -16,6 +16,7 @@ class TankToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final onSelectionChanged = enabled && !busy
         ? (Set<bool> selected) {
             if (selected.isNotEmpty) {
@@ -58,42 +59,44 @@ class TankToggle extends StatelessWidget {
               side: WidgetStateProperty.resolveWith(
                 (states) {
                   if (states.contains(WidgetState.disabled)) {
-                    return const BorderSide(color: Color(0x33FFFFFF));
+                    return const BorderSide(color: Color(0xFFE2E8F0));
                   }
                   if (states.contains(WidgetState.selected)) {
-                    return const BorderSide(color: Color(0xFF1E3A8A), width: 1.4);
+                    return BorderSide(color: theme.colorScheme.primary, width: 1.2);
                   }
-                  return const BorderSide(color: Color(0xFFCBD5F5));
+                  return const BorderSide(color: Color(0xFFE2E8F0));
                 },
               ),
               backgroundColor: WidgetStateProperty.resolveWith(
                 (states) {
                   if (states.contains(WidgetState.disabled)) {
-                    return Colors.white.withValues(alpha: 0.08);
+                    return const Color(0xFFF1F5F9);
                   }
                   if (states.contains(WidgetState.selected)) {
                     return const Color(0xFFEEF2FF);
                   }
-                  return Colors.white.withValues(alpha: 0.18);
+                  return Colors.white;
                 },
               ),
               foregroundColor: WidgetStateProperty.resolveWith(
                 (states) {
                   if (states.contains(WidgetState.disabled)) {
-                    return Colors.white54;
+                    return const Color(0xFF94A3B8);
                   }
                   if (states.contains(WidgetState.selected)) {
-                    return const Color(0xFF1D4ED8);
+                    return theme.colorScheme.primary;
                   }
-                  return Colors.white;
+                  return const Color(0xFF334155);
                 },
               ),
               iconColor: WidgetStateProperty.resolveWith(
                 (states) {
                   if (states.contains(WidgetState.disabled)) {
-                    return Colors.white54;
+                    return const Color(0xFF94A3B8);
                   }
-                  return states.contains(WidgetState.selected) ? const Color(0xFF2563EB) : Colors.white70;
+                  return states.contains(WidgetState.selected)
+                      ? theme.colorScheme.primary
+                      : const Color(0xFF64748B);
                 },
               ),
             ),
@@ -105,14 +108,13 @@ class TankToggle extends StatelessWidget {
           Container(
             height: 72,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.65),
-              borderRadius: BorderRadius.circular(12),
+              color: Colors.white.withOpacity(0.7),
+              borderRadius: BorderRadius.circular(20),
             ),
             alignment: Alignment.center,
-            child: const SizedBox(
-              height: 20,
-              width: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation(theme.colorScheme.primary),
             ),
           ),
       ],
@@ -128,26 +130,16 @@ class _SegmentContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final baseStyle = theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700);
+    final subtitleStyle = theme.textTheme.bodySmall?.copyWith(color: const Color(0xFF64748B));
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.1,
-          ),
-        ),
+        Text(title, style: baseStyle),
         const SizedBox(height: 2),
-        Text(
-          subtitle,
-          style: TextStyle(
-            fontSize: 11,
-            color: Colors.white.withValues(alpha: 0.85),
-            letterSpacing: 0.1,
-          ),
-        ),
+        Text(subtitle, style: subtitleStyle),
       ],
     );
   }

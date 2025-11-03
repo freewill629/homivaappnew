@@ -14,28 +14,26 @@ class TankStatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final backgroundGradient = isOn
-        ? const [Color(0xFF34D399), Color(0xFF10B981)]
-        : const [Color(0xFFCBD5F5), Color(0xFFA5B4FC)];
-    final borderColor = isConnected
-        ? Colors.white.withValues(alpha: 0.4)
-        : Colors.white.withValues(alpha: 0.12);
-    final label = hasStatus
-        ? (isOn ? 'Power ON' : 'Power OFF')
-        : 'Awaiting status';
+        ? const [Color(0xFF6366F1), Color(0xFF818CF8)]
+        : const [Color(0xFFF4F6FF), Color(0xFFE2E8F0)];
+    final labelColor = isOn ? Colors.white : const Color(0xFF334155);
+    final iconColor = isOn ? Colors.white : theme.colorScheme.primary;
+    final label = hasStatus ? (isOn ? 'Power ON' : 'Power OFF') : 'Awaiting status';
     return AnimatedContainer(
       duration: const Duration(milliseconds: 240),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         gradient: LinearGradient(colors: backgroundGradient),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: borderColor),
+        border: Border.all(color: isConnected ? theme.colorScheme.primary.withOpacity(0.3) : const Color(0xFFE2E8F0)),
         boxShadow: [
           if (hasStatus)
             BoxShadow(
-              color: (isOn ? const Color(0xFF0F766E) : const Color(0xFF312E81)).withValues(alpha: 0.22),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
+              color: (isOn ? theme.colorScheme.primary : const Color(0xFF94A3B8)).withOpacity(0.22),
+              blurRadius: 18,
+              offset: const Offset(0, 10),
             ),
         ],
       ),
@@ -45,16 +43,16 @@ class TankStatusChip extends StatelessWidget {
           Icon(
             isOn ? Icons.flash_on : Icons.flash_off,
             size: 18,
-            color: Colors.white,
+            color: iconColor,
           ),
           const SizedBox(width: 8),
           Text(
             label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.2,
-                ),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: labelColor,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.2,
+            ),
           ),
         ],
       ),

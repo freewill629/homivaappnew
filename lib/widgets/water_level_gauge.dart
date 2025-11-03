@@ -77,13 +77,16 @@ class _WaterLevelGaugeState extends State<WaterLevelGauge>
           children: [
             Container(
               padding: const EdgeInsets.all(18),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Color(0x332563EB), Color(0x3338BDF8)],
+                  colors: [
+                    theme.colorScheme.primary.withOpacity(0.12),
+                    theme.colorScheme.secondary.withOpacity(0.16),
+                  ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.all(Radius.circular(36)),
+                borderRadius: const BorderRadius.all(Radius.circular(36)),
               ),
               child: SizedBox(
                 height: 260,
@@ -113,7 +116,7 @@ class _WaterLevelGaugeState extends State<WaterLevelGauge>
                             gradient: const LinearGradient(
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
-                              colors: [Color(0x22FFFFFF), Color(0x00111B3A)],
+                              colors: [Color(0x55FFFFFF), Color(0x004256D1)],
                             ),
                           ),
                         ),
@@ -135,16 +138,15 @@ class _WaterLevelGaugeState extends State<WaterLevelGauge>
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.12),
+                                color: Colors.white.withOpacity(0.65),
                                 borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.18),
-                                ),
                               ),
                               child: Text(
                                 widget.isConnected ? 'Live' : 'Standby',
                                 style: theme.textTheme.bodySmall?.copyWith(
-                                  color: Colors.white70,
+                                  color: widget.isConnected
+                                      ? theme.colorScheme.primary
+                                      : const Color(0xFF475569),
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -167,7 +169,7 @@ class _WaterLevelGaugeState extends State<WaterLevelGauge>
                               Text(
                                 'Tank level',
                                 style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: Colors.white60,
+                                  color: Colors.white.withOpacity(0.85),
                                 ),
                               ),
                             ],
@@ -176,7 +178,7 @@ class _WaterLevelGaugeState extends State<WaterLevelGauge>
                             alignment: Alignment.bottomCenter,
                             child: Icon(
                               Icons.water_drop,
-                              color: Colors.white.withValues(alpha: 0.6),
+                              color: Colors.white.withOpacity(0.7),
                               size: 24,
                             ),
                           ),
@@ -191,7 +193,7 @@ class _WaterLevelGaugeState extends State<WaterLevelGauge>
             Text(
               'Water Level',
               style: theme.textTheme.titleLarge?.copyWith(
-                color: Colors.white,
+                color: theme.colorScheme.primary,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -199,9 +201,9 @@ class _WaterLevelGaugeState extends State<WaterLevelGauge>
             LiveSyncStatus(
               label: statusText,
               isActive: widget.isConnected && !widget.isLoading,
-              color: Colors.white70,
-              activeDotColor: const Color(0xFF34D399),
-              inactiveDotColor: Colors.white24,
+              color: const Color(0xFF475569),
+              activeDotColor: theme.colorScheme.primary,
+              inactiveDotColor: const Color(0xFFCBD5F5),
             ),
           ],
         );
@@ -215,22 +217,26 @@ class _TankShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(44),
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFF0B1224), Color(0xFF172554)],
+          colors: [
+            theme.colorScheme.primary.withOpacity(0.85),
+            const Color(0xFF1D4ED8),
+          ],
         ),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.18),
-          width: 1.4,
+          color: Colors.white.withOpacity(0.4),
+          width: 1.2,
         ),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x44111B3A),
-            blurRadius: 26,
+            color: Color(0x334455AA),
+            blurRadius: 30,
             spreadRadius: 4,
             offset: Offset(0, 18),
           ),
@@ -285,7 +291,7 @@ class _WaterFillPainter extends CustomPainter {
       ..close();
 
     final gradient = const LinearGradient(
-      colors: [Color(0xFF38BDF8), Color(0xFF2563EB), Color(0xFF1D4ED8)],
+      colors: [Color(0xFF60A5FA), Color(0xFF6366F1), Color(0xFF4C1D95)],
       stops: [0.0, 0.6, 1.0],
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
@@ -302,7 +308,7 @@ class _WaterFillPainter extends CustomPainter {
     canvas.drawPath(wavePath, fillPaint);
 
     final foamPaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.12)
+      ..color = Colors.white.withOpacity(0.18)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 
