@@ -16,8 +16,8 @@ class PrimaryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDisabled = loading || onPressed == null;
     final gradientColors = isDisabled
-        ? const [Color(0x332563EB), Color(0x3322D3EE)]
-        : const [Color(0xFF2563EB), Color(0xFF22D3EE)];
+        ? const [Color(0xFFCBD5F5), Color(0xFFC7D2FE)]
+        : const [Color(0xFF6366F1), Color(0xFF8B5CF6)];
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
@@ -26,7 +26,7 @@ class PrimaryButton extends StatelessWidget {
         boxShadow: isDisabled
             ? const []
             : const [
-                BoxShadow(color: Color(0x663B82F6), blurRadius: 20, offset: Offset(0, 10)),
+                BoxShadow(color: Color(0x446366F1), blurRadius: 26, offset: Offset(0, 14)),
               ],
       ),
       child: ElevatedButton(

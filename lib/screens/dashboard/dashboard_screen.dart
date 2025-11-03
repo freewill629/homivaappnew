@@ -29,109 +29,143 @@ class DashboardScreen extends StatelessWidget {
     final canToggle = tankProvider.canControl && !tankProvider.isWriting;
 
     final theme = Theme.of(context);
-    final headline = theme.textTheme.headlineMedium?.copyWith(
-      color: Colors.white,
-      fontWeight: FontWeight.w700,
-      letterSpacing: -0.4,
-    );
-    final subtle = theme.textTheme.bodyMedium?.copyWith(color: Colors.white70);
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        titleSpacing: 0,
-        title: Row(
-          children: [
-            const HomivaLogo(size: 36),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text('Homiva', style: theme.textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w700)),
-                Text('Smart water intelligence', style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70)),
-              ],
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            tooltip: 'Sign out',
-            onPressed: () => context.read<AuthService>().signOut(),
-            icon: const Icon(Icons.logout, color: Colors.white),
-          ),
-        ],
-      ),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF0B1121), Color(0xFF111F4D), Color(0xFF1F3A8A)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            colors: [Color(0xFFF8FAFF), Color(0xFFEFF3FF)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
         ),
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (tankProvider.error != null)
-                  _DisconnectedBanner(message: tankProvider.error!),
-                if (user != null)
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Welcome back,', style: subtle),
-                      const SizedBox(height: 4),
-                      Text(user.email ?? 'Explorer', style: headline),
-                      const SizedBox(height: 24),
-                    ],
-                  ),
-                GlassContainer(
-                  child: Column(
-                    children: [
-                      WaterLevelGauge(
-                        levelPercent: tankProvider.waterLevelPercent,
-                        isConnected: tankProvider.isConnected,
-                        isLoading: tankProvider.isLoading && !tankProvider.hasData,
-                      ),
-                      const SizedBox(height: 24),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const HomivaLogo(size: 42),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Last sync', style: subtle),
-                              const SizedBox(height: 4),
-                              Text(updatedAtLabel, style: theme.textTheme.titleMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.w600)),
-                            ],
+                          Text(
+                            'Homiva',
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.4,
+                            ),
                           ),
-                          LiveSyncStatus(
-                            label: tankProvider.isConnected ? 'Live · syncing' : 'Awaiting connection',
-                            isActive: tankProvider.isConnected,
-                            color: Colors.white70,
-                            activeDotColor: const Color(0xFF34D399),
-                            inactiveDotColor: Colors.white24,
+                          const SizedBox(height: 6),
+                          Text(
+                            'Smart water intelligence for your home',
+                            style: theme.textTheme.bodyMedium?.copyWith(color: const Color(0xFF64748B)),
                           ),
                         ],
                       ),
-                    ],
-                  ),
+                    ),
+                    IconButton(
+                      tooltip: 'Sign out',
+                      onPressed: () => context.read<AuthService>().signOut(),
+                      icon: const Icon(Icons.logout_rounded, color: Color(0xFF94A3B8)),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 28),
+                if (tankProvider.error != null)
+                  _DisconnectedBanner(message: tankProvider.error!),
+                if (user != null)
+                  GlassContainer(
+                    padding: const EdgeInsets.all(20),
+                    borderRadius: 24,
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 32,
+                          backgroundColor: theme.colorScheme.primary.withOpacity(0.12),
+                          child: Text(
+                            user.email != null && user.email!.isNotEmpty
+                                ? user.email!.substring(0, 1).toUpperCase()
+                                : 'H',
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Welcome back',
+                                style: theme.textTheme.bodyMedium?.copyWith(color: const Color(0xFF64748B)),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                user.email ?? 'Explorer',
+                                style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEFF4FF),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.check_circle, size: 18, color: theme.colorScheme.primary),
+                              const SizedBox(width: 8),
+                              Text(
+                                tankProvider.isConnected ? 'Controller online' : 'Awaiting link',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                const SizedBox(height: 28),
                 GlassContainer(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Pump power control', style: theme.textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w700)),
-                          const Spacer(),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'My tank',
+                                  style: theme.textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  'Monitor and control your water storage in real time.',
+                                  style: theme.textTheme.bodyMedium?.copyWith(color: const Color(0xFF64748B)),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 12),
                           TankStatusChip(
                             isOn: motorIsOn,
                             hasStatus: tankProvider.hasStatus,
@@ -139,15 +173,85 @@ class DashboardScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
-                      LiveSyncStatus(
-                        label: tankProvider.isConnected ? 'Live · syncing' : 'Awaiting connection',
-                        isActive: tankProvider.isConnected,
-                        color: Colors.white70,
-                        activeDotColor: const Color(0xFF34D399),
-                        inactiveDotColor: Colors.white24,
+                      const SizedBox(height: 24),
+                      WaterLevelGauge(
+                        levelPercent: tankProvider.waterLevelPercent,
+                        isConnected: tankProvider.isConnected,
+                        isLoading: tankProvider.isLoading && !tankProvider.hasData,
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 24),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Last sync',
+                                style: theme.textTheme.bodySmall?.copyWith(color: const Color(0xFF64748B)),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                updatedAtLabel,
+                                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                              ),
+                            ],
+                          ),
+                          const Spacer(),
+                          LiveSyncStatus(
+                            label: tankProvider.isConnected ? 'Live · syncing' : 'Awaiting connection',
+                            isActive: tankProvider.isConnected,
+                            color: const Color(0xFF475569),
+                            activeDotColor: theme.colorScheme.primary,
+                            inactiveDotColor: const Color(0xFFCBD5F5),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 28),
+                GlassContainer(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary.withOpacity(0.08),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Icon(Icons.tungsten_outlined, color: theme.colorScheme.primary),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Pump controls',
+                                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Switch between automatic and manual overrides.',
+                                  style: theme.textTheme.bodyMedium?.copyWith(color: const Color(0xFF64748B)),
+                                ),
+                              ],
+                            ),
+                          ),
+                          LiveSyncStatus(
+                            label: tankProvider.isConnected ? 'Live' : 'Offline',
+                            isActive: tankProvider.isConnected,
+                            color: const Color(0xFF475569),
+                            activeDotColor: theme.colorScheme.primary,
+                            inactiveDotColor: const Color(0xFFCBD5F5),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -157,15 +261,14 @@ class DashboardScreen extends StatelessWidget {
                               children: [
                                 Text(
                                   'Manual mode',
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
                                 ),
-                                const SizedBox(height: 4),
+                                const SizedBox(height: 6),
                                 Text(
-                                  'Enable to override automatic pump control.',
-                                  style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70),
+                                  manualModeEnabled
+                                      ? 'Manual overrides are active. Commands act instantly.'
+                                      : 'Automatic safety is active. Enable manual mode to intervene.',
+                                  style: theme.textTheme.bodyMedium?.copyWith(color: const Color(0xFF64748B)),
                                 ),
                               ],
                             ),
@@ -173,10 +276,13 @@ class DashboardScreen extends StatelessWidget {
                           AnimatedSwitcher(
                             duration: const Duration(milliseconds: 200),
                             child: tankProvider.isUpdatingManualControl
-                                ? const SizedBox(
+                                ? SizedBox(
                                     height: 28,
                                     width: 28,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation(theme.colorScheme.primary),
+                                    ),
                                   )
                                 : Switch(
                                     value: manualModeEnabled,
@@ -197,20 +303,10 @@ class DashboardScreen extends StatelessWidget {
                                             }
                                           }
                                         : null,
-                                    activeColor: Colors.white,
-                                    activeTrackColor: const Color(0xFF2563EB),
-                                    inactiveThumbColor: Colors.white70,
-                                    inactiveTrackColor: Colors.white24,
+                                    activeColor: theme.colorScheme.primary,
                                   ),
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        manualModeEnabled
-                            ? 'Switch the pump on or off instantly. Manual commands override the controller while this mode is active.'
-                            : 'Automatic safety is active. Turn on manual mode to control the pump from the app.',
-                        style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white70),
                       ),
                       const SizedBox(height: 24),
                       TankToggle(
@@ -230,7 +326,7 @@ class DashboardScreen extends StatelessWidget {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton.icon(
-                          style: TextButton.styleFrom(foregroundColor: Colors.white),
+                          style: TextButton.styleFrom(foregroundColor: theme.colorScheme.primary),
                           onPressed: () => Navigator.of(context).push(
                             MaterialPageRoute<void>(
                               builder: (_) => const TankControlScreen(),
@@ -244,7 +340,10 @@ class DashboardScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 32),
-                Text('Coming next', style: theme.textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w700)),
+                Text(
+                  'Coming next',
+                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                ),
                 const SizedBox(height: 12),
                 GridView.builder(
                   shrinkWrap: true,
@@ -290,29 +389,33 @@ class _DisconnectedBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFFFFD9C0), Color(0xFFFFEDD5)],
+          colors: [Color(0xFFFFF4D6), Color(0xFFFFEDD5)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFF97316).withValues(alpha: 0.5)),
+        border: Border.all(color: const Color(0xFFFBBF24).withOpacity(0.35)),
         boxShadow: const [
-          BoxShadow(color: Color(0x33F97316), blurRadius: 16, offset: Offset(0, 8)),
+          BoxShadow(color: Color(0x22F59E0B), blurRadius: 16, offset: Offset(0, 8)),
         ],
       ),
       child: Row(
         children: [
-          const Icon(Icons.wifi_off, color: Color(0xFF9A3412)),
+          const Icon(Icons.wifi_off, color: Color(0xFFB45309)),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               message,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: const Color(0xFF7C2D12), fontWeight: FontWeight.w600),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: const Color(0xFF92400E),
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -320,7 +423,6 @@ class _DisconnectedBanner extends StatelessWidget {
     );
   }
 }
-
 
 class _FeatureDescription {
   const _FeatureDescription(this.title, this.description);
