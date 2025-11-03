@@ -53,12 +53,6 @@ class TankProvider extends ChangeNotifier {
     _isLoading = true;
     _error = null;
     notifyListeners();
-    try {
-      await _db.ensureDataExists();
-    } catch (e) {
-      _error = 'Failed to initialize tank data';
-      notifyListeners();
-    }
     _subscription = _db.dataRef.onValue.listen(
       (event) {
         final raw = event.snapshot.value;
