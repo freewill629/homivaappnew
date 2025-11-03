@@ -65,18 +65,16 @@ class DbService {
   }
 
   Future<void> setManualControl(bool enabled) async {
-    await dataRef.update({
-      'manual_control': enabled ? 1 : 0,
-      if (!enabled) 'manual_command': 0,
-      'updated_at': ServerValue.timestamp,
-    });
+    await dataRef.child('manual_control').set(enabled ? 1 : 0);
+    if (!enabled) {
+      await dataRef.child('manual_command').set(0);
+    }
+    await dataRef.child('updated_at').set(ServerValue.timestamp);
   }
 
   Future<void> setManualCommand(bool enabled) async {
-    await dataRef.update({
-      'manual_command': enabled ? 1 : 0,
-      'updated_at': ServerValue.timestamp,
-    });
+    await dataRef.child('manual_command').set(enabled ? 1 : 0);
+    await dataRef.child('updated_at').set(ServerValue.timestamp);
   }
 }
 
