@@ -17,99 +17,75 @@ class TankToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final onSelectionChanged = enabled && !busy
-        ? (Set<bool> selected) {
-            if (selected.isNotEmpty) {
-              onChanged(selected.first);
-            }
-          }
-        : null;
+    final canInteract = enabled && !busy;
     return Stack(
       alignment: Alignment.center,
       children: [
-        SizedBox(
-          height: 72,
-          child: SegmentedButton<bool>(
-            segments: const [
-              ButtonSegment(
-                value: false,
-                icon: Icon(Icons.power_settings_new),
-                label: _SegmentContent(
-                  title: 'Pump off',
-                  subtitle: 'Stops water flow',
-                ),
-              ),
-              ButtonSegment(
-                value: true,
-                icon: Icon(Icons.bolt),
-                label: _SegmentContent(
-                  title: 'Pump on',
-                  subtitle: 'Starts pumping now',
-                ),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(28),
+            gradient: const LinearGradient(
+              colors: [Color(0xFFEEF2FF), Color(0xFFE0E7FF)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x190F172A),
+                blurRadius: 22,
+                offset: Offset(0, 12),
               ),
             ],
-            showSelectedIcon: false,
-            style: ButtonStyle(
-              shape: WidgetStateProperty.all(
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              ),
-              padding: WidgetStateProperty.all(
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-              ),
-              side: WidgetStateProperty.resolveWith(
-                (states) {
-                  if (states.contains(WidgetState.disabled)) {
-                    return const BorderSide(color: Color(0xFFE2E8F0));
-                  }
-                  if (states.contains(WidgetState.selected)) {
-                    return BorderSide(color: theme.colorScheme.primary, width: 1.2);
-                  }
-                  return const BorderSide(color: Color(0xFFE2E8F0));
-                },
-              ),
-              backgroundColor: WidgetStateProperty.resolveWith(
-                (states) {
-                  if (states.contains(WidgetState.disabled)) {
-                    return const Color(0xFFF1F5F9);
-                  }
-                  if (states.contains(WidgetState.selected)) {
-                    return const Color(0xFFEEF2FF);
-                  }
-                  return Colors.white;
-                },
-              ),
-              foregroundColor: WidgetStateProperty.resolveWith(
-                (states) {
-                  if (states.contains(WidgetState.disabled)) {
-                    return const Color(0xFF94A3B8);
-                  }
-                  if (states.contains(WidgetState.selected)) {
-                    return theme.colorScheme.primary;
-                  }
-                  return const Color(0xFF334155);
-                },
-              ),
-              iconColor: WidgetStateProperty.resolveWith(
-                (states) {
-                  if (states.contains(WidgetState.disabled)) {
-                    return const Color(0xFF94A3B8);
-                  }
-                  return states.contains(WidgetState.selected)
-                      ? theme.colorScheme.primary
-                      : const Color(0xFF64748B);
-                },
-              ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(4),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _ToggleOption(
+                    icon: Icons.power_settings_new,
+                    title: 'Pump off',
+                    subtitle: 'Stops water flow',
+                    selected: !isOn,
+                    onTap: canInteract && isOn ? () => onChanged(false) : null,
+                    theme: theme,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(24),
+                      bottomLeft: Radius.circular(24),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: _ToggleOption(
+                    icon: Icons.bolt,
+                    title: 'Pump on',
+                    subtitle: 'Starts pumping now',
+                    selected: isOn,
+                    onTap: canInteract && !isOn ? () => onChanged(true) : null,
+                    theme: theme,
+                    borderRadius: const BorderRadius.only(
+                      topRight: Radius.circular(24),
+                      bottomRight: Radius.circular(24),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            selected: <bool>{isOn},
-            onSelectionChanged: onSelectionChanged,
           ),
         ),
+        if (!enabled)
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(28),
+              color: Colors.white.withOpacity(0.6),
+            ),
+          ),
         if (busy)
           Container(
-            height: 72,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.7),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(28),
+              color: Colors.white.withOpacity(0.75),
             ),
             alignment: Alignment.center,
             child: CircularProgressIndicator(
@@ -122,25 +98,99 @@ class TankToggle extends StatelessWidget {
   }
 }
 
-class _SegmentContent extends StatelessWidget {
-  const _SegmentContent({required this.title, required this.subtitle});
+class _ToggleOption extends StatelessWidget {
+  const _ToggleOption({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.selected,
+    required this.theme,
+    required this.borderRadius,
+    this.onTap,
+  });
 
+  final IconData icon;
   final String title;
   final String subtitle;
+  final bool selected;
+  final ThemeData theme;
+  final BorderRadius borderRadius;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final baseStyle = theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700);
-    final subtitleStyle = theme.textTheme.bodySmall?.copyWith(color: const Color(0xFF64748B));
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: baseStyle),
-        const SizedBox(height: 2),
-        Text(subtitle, style: subtitleStyle),
-      ],
+    final textColor = selected ? theme.colorScheme.primary : const Color(0xFF334155);
+    final subtitleColor = selected ? theme.colorScheme.primary.withOpacity(0.75) : const Color(0xFF64748B);
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
+      decoration: BoxDecoration(
+        borderRadius: borderRadius,
+        color: selected ? Colors.white : Colors.white.withOpacity(0.35),
+        boxShadow: selected
+            ? const [
+                BoxShadow(
+                  color: Color(0x1A1E3A8A),
+                  blurRadius: 18,
+                  offset: Offset(0, 10),
+                ),
+              ]
+            : null,
+      ),
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          borderRadius: borderRadius,
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: selected
+                        ? theme.colorScheme.primary.withOpacity(0.12)
+                        : const Color(0xFFE2E8F0),
+                  ),
+                  padding: const EdgeInsets.all(10),
+                  child: Icon(
+                    icon,
+                    color: selected ? theme.colorScheme.primary : const Color(0xFF64748B),
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        title,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          color: textColor,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.1,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: subtitleColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

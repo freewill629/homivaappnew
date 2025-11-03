@@ -97,10 +97,12 @@ class TankControlScreen extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 24),
-                      WaterLevelGauge(
-                        levelPercent: levelPercent,
-                        isConnected: tankProvider.isConnected,
-                        isLoading: tankProvider.isLoading && !tankProvider.hasData,
+                      Center(
+                        child: WaterLevelGauge(
+                          levelPercent: levelPercent,
+                          isConnected: tankProvider.isConnected,
+                          isLoading: tankProvider.isLoading && !tankProvider.hasData,
+                        ),
                       ),
                       const SizedBox(height: 20),
                       Container(
