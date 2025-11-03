@@ -23,20 +23,10 @@ class DbService {
     }
 
     final updates = <String, Object?>{};
-    final distance = value['distance_cm'];
     final manualControl = value['manual_control'];
     final manualCommand = value['manual_command'];
     final motorState = value['motor_state'];
     final updatedAt = value['updated_at'];
-
-    if (distance is num) {
-      final normalized = _normalizeDistance(distance.toDouble());
-      if (normalized != distance) {
-        updates['distance_cm'] = normalized;
-      }
-    } else {
-      updates['distance_cm'] = 10.0;
-    }
 
     final normalizedManualControl = _coerceToIntFlag(manualControl);
     if (normalizedManualControl != null) {
@@ -101,17 +91,11 @@ FirebaseDatabase _resolveDatabase(FirebaseApp? app) {
 
 Map<String, Object?> _defaultDataPayload() {
   return {
-    'distance_cm': 10.0,
     'manual_control': 0,
     'manual_command': 0,
     'motor_state': 'OFF',
     'updated_at': ServerValue.timestamp,
   };
-}
-
-double _normalizeDistance(double value) {
-  final normalized = value.clamp(0, 10);
-  return double.parse(normalized.toStringAsFixed(2));
 }
 
 String _normalizeMotorState(String raw) {
