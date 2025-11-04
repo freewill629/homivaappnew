@@ -27,6 +27,8 @@ class DashboardScreen extends StatelessWidget {
     final manualModeKnown = manualMode != null;
     final manualModeEnabled = manualMode ?? false;
     final canToggle = tankProvider.canControl && !tankProvider.isWriting;
+    final displayName = user != null ? _displayName(user) : null;
+    final initials = user != null ? _initialsForUser(user) : 'H';
 
     final theme = Theme.of(context);
 
@@ -87,12 +89,10 @@ class DashboardScreen extends StatelessWidget {
                     child: Row(
                       children: [
                         CircleAvatar(
-                          radius: 32,
+                          radius: 30,
                           backgroundColor: theme.colorScheme.primary.withOpacity(0.12),
                           child: Text(
-                            user.email != null && user.email!.isNotEmpty
-                                ? user.email!.substring(0, 1).toUpperCase()
-                                : 'H',
+                            initials,
                             style: theme.textTheme.titleLarge?.copyWith(
                               color: theme.colorScheme.primary,
                               fontWeight: FontWeight.w700,
@@ -110,27 +110,32 @@ class DashboardScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                user.email ?? 'Explorer',
+                                displayName ?? 'Explorer',
                                 style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
                               ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFEFF4FF),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.check_circle, size: 18, color: theme.colorScheme.primary),
-                              const SizedBox(width: 8),
-                              Text(
-                                tankProvider.isConnected ? 'Controller online' : 'Awaiting link',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.primary,
-                                  fontWeight: FontWeight.w600,
+                              const SizedBox(height: 12),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFEFF4FF),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.check_circle, size: 18, color: theme.colorScheme.primary),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        tankProvider.isConnected ? 'All systems connected' : 'Waiting to connect',
+                                        style: theme.textTheme.bodySmall?.copyWith(
+                                          color: theme.colorScheme.primary,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ],
@@ -379,6 +384,64 @@ class DashboardScreen extends StatelessWidget {
     final minutes = time.minute.toString().padLeft(2, '0');
     final seconds = time.second.toString().padLeft(2, '0');
     return '$hours:$minutes:$seconds';
+  }
+
+  String _displayName(User user) {
+    final trimmedName = user.displayName?.trim();
+    if (trimmedName != null && trimmedName.isNotEmpty) {
+      return trimmedName;
+    }
+
+    final email = user.email;
+    if (email != null && email.isNotEmpty) {
+      final localPart = email.split('@').first;
+      final normalized = localPart.replaceAll(RegExp(r'[._-]+'), ' ');
+      final segments = normalized.split(RegExp(r'\s+')).where((segment) => segment.isNotEmpty).toList();
+      if (segments.isNotEmpty) {
+        return segments.map(_capitalize).join(' ');
+      }
+      if (localPart.isNotEmpty) {
+        return _capitalize(localPart);
+      }
+    }
+
+    return 'Explorer';
+  }
+
+  String _initialsForUser(User user) {
+    final name = _displayName(user);
+    final parts = name.split(RegExp(r'\s+')).where((part) => part.isNotEmpty).toList();
+    if (parts.isEmpty) {
+      return 'H';
+    }
+
+    final first = parts.first;
+    final last = parts.length > 1 ? parts.last : '';
+
+    final buffer = StringBuffer();
+    if (first.isNotEmpty) {
+      buffer.write(first[0].toUpperCase());
+    }
+    if (last.isNotEmpty) {
+      buffer.write(last[0].toUpperCase());
+    }
+
+    final result = buffer.toString();
+    if (result.isNotEmpty) {
+      return result;
+    }
+
+    return 'H';
+  }
+
+  String _capitalize(String value) {
+    if (value.isEmpty) {
+      return value;
+    }
+    if (value.length == 1) {
+      return value.toUpperCase();
+    }
+    return value[0].toUpperCase() + value.substring(1).toLowerCase();
   }
 }
 
