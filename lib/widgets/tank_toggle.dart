@@ -18,82 +18,112 @@ class TankToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final canInteract = enabled && !busy;
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(28),
-            gradient: const LinearGradient(
-              colors: [Color(0xFFEEF2FF), Color(0xFFE0E7FF)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x190F172A),
-                blurRadius: 22,
-                offset: Offset(0, 12),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isCompact = constraints.maxWidth < 360;
+        final outerRadius = BorderRadius.circular(22);
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: outerRadius,
+                color: Colors.white,
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x140F172A),
+                    blurRadius: 16,
+                    offset: Offset(0, 10),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(4),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _ToggleOption(
-                    icon: Icons.power_settings_new,
-                    title: 'Pump off',
-                    subtitle: 'Stops water flow',
-                    selected: !isOn,
-                    onTap: canInteract && isOn ? () => onChanged(false) : null,
-                    theme: theme,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(24),
-                      bottomLeft: Radius.circular(24),
-                    ),
-                  ),
+              child: Padding(
+                padding: const EdgeInsets.all(3),
+                child: isCompact
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _ToggleOption(
+                            icon: Icons.power_settings_new,
+                            title: 'Pump off',
+                            subtitle: 'Stops water flow',
+                            selected: !isOn,
+                            onTap: canInteract && isOn ? () => onChanged(false) : null,
+                            theme: theme,
+                            borderRadius: BorderRadius.circular(16),
+                            dense: true,
+                          ),
+                          const SizedBox(height: 4),
+                          _ToggleOption(
+                            icon: Icons.bolt,
+                            title: 'Pump on',
+                            subtitle: 'Starts pumping now',
+                            selected: isOn,
+                            onTap: canInteract && !isOn ? () => onChanged(true) : null,
+                            theme: theme,
+                            borderRadius: BorderRadius.circular(16),
+                            dense: true,
+                          ),
+                        ],
+                      )
+                    : Row(
+                        children: [
+                          Expanded(
+                            child: _ToggleOption(
+                              icon: Icons.power_settings_new,
+                              title: 'Pump off',
+                              subtitle: 'Stops water flow',
+                              selected: !isOn,
+                              onTap: canInteract && isOn ? () => onChanged(false) : null,
+                              theme: theme,
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(18),
+                                bottomLeft: Radius.circular(18),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 3),
+                          Expanded(
+                            child: _ToggleOption(
+                              icon: Icons.bolt,
+                              title: 'Pump on',
+                              subtitle: 'Starts pumping now',
+                              selected: isOn,
+                              onTap: canInteract && !isOn ? () => onChanged(true) : null,
+                              theme: theme,
+                              borderRadius: const BorderRadius.only(
+                                topRight: Radius.circular(18),
+                                bottomRight: Radius.circular(18),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
+            ),
+            if (!enabled)
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: outerRadius,
+                  color: Colors.white.withOpacity(0.65),
                 ),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: _ToggleOption(
-                    icon: Icons.bolt,
-                    title: 'Pump on',
-                    subtitle: 'Starts pumping now',
-                    selected: isOn,
-                    onTap: canInteract && !isOn ? () => onChanged(true) : null,
-                    theme: theme,
-                    borderRadius: const BorderRadius.only(
-                      topRight: Radius.circular(24),
-                      bottomRight: Radius.circular(24),
-                    ),
-                  ),
+              ),
+            if (busy)
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: outerRadius,
+                  color: Colors.white.withOpacity(0.75),
                 ),
-              ],
-            ),
-          ),
-        ),
-        if (!enabled)
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(28),
-              color: Colors.white.withOpacity(0.6),
-            ),
-          ),
-        if (busy)
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(28),
-              color: Colors.white.withOpacity(0.75),
-            ),
-            alignment: Alignment.center,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation(theme.colorScheme.primary),
-            ),
-          ),
-      ],
+                alignment: Alignment.center,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation(theme.colorScheme.primary),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }
@@ -107,6 +137,7 @@ class _ToggleOption extends StatelessWidget {
     required this.theme,
     required this.borderRadius,
     this.onTap,
+    this.dense = false,
   });
 
   final IconData icon;
@@ -116,6 +147,7 @@ class _ToggleOption extends StatelessWidget {
   final ThemeData theme;
   final BorderRadius borderRadius;
   final VoidCallback? onTap;
+  final bool dense;
 
   @override
   Widget build(BuildContext context) {
@@ -126,16 +158,10 @@ class _ToggleOption extends StatelessWidget {
       curve: Curves.easeOut,
       decoration: BoxDecoration(
         borderRadius: borderRadius,
-        color: selected ? Colors.white : Colors.white.withOpacity(0.35),
-        boxShadow: selected
-            ? const [
-                BoxShadow(
-                  color: Color(0x1A1E3A8A),
-                  blurRadius: 18,
-                  offset: Offset(0, 10),
-                ),
-              ]
-            : null,
+        color: selected ? Colors.white : const Color(0xFFF1F5F9),
+        border: Border.all(
+          color: selected ? theme.colorScheme.primary.withOpacity(0.24) : const Color(0xFFE2E8F0),
+        ),
       ),
       child: Material(
         type: MaterialType.transparency,
@@ -143,7 +169,10 @@ class _ToggleOption extends StatelessWidget {
           borderRadius: borderRadius,
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+            padding: EdgeInsets.symmetric(
+              horizontal: dense ? 16 : 20,
+              vertical: dense ? 14 : 16,
+            ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -154,14 +183,14 @@ class _ToggleOption extends StatelessWidget {
                         ? theme.colorScheme.primary.withOpacity(0.12)
                         : const Color(0xFFE2E8F0),
                   ),
-                  padding: const EdgeInsets.all(10),
+                  padding: EdgeInsets.all(dense ? 8 : 10),
                   child: Icon(
                     icon,
                     color: selected ? theme.colorScheme.primary : const Color(0xFF64748B),
-                    size: 22,
+                    size: dense ? 18 : 20,
                   ),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: dense ? 12 : 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
